@@ -47,7 +47,7 @@ public abstract class AbstractRevisionRepository<T> implements RevisionRepositor
 
     /**
      * @param id Long
-     * @return Revisions<Long, BRPhysicPerson>
+     * @return Revision
      */
     @Override
     public Page<T> findRevisionsById(final UUID id, final Pageable pageable) {
