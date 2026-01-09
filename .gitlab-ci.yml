@@ -39,7 +39,7 @@ deploy:
   tags:
     - common
   script:
-    - mvn deploy -DskipTests
+    - mvn deploy
     - cat target/site/jacoco/index.html | grep -o 'Total[^%]*%' | sed 's/Total/Total Coverage:/'
   coverage: '/\d+\%/'
   artifacts:
