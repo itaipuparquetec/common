@@ -3,6 +3,8 @@ package br.org.itaipuparquetec.common.infrastructure.rest;
 import br.org.itaipuparquetec.common.application.services.LocaleService;
 import br.org.itaipuparquetec.common.domain.exceptions.*;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.context.MessageSource;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpHeaders;
@@ -22,6 +24,8 @@ import java.util.regex.Pattern;
 @RequiredArgsConstructor
 public class RestResponseEntityExceptionHandler extends ResponseEntityExceptionHandler {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(RestResponseEntityExceptionHandler.class);
+
     private final MessageSource messageSource;
     private final LocaleService localeService;
 
@@ -29,8 +33,9 @@ public class RestResponseEntityExceptionHandler extends ResponseEntityExceptionH
     public ResponseEntity<Object> handleEmptyFieldException(final EmptyFieldException exception, final WebRequest request) {
         final var attributes = messageSource.getMessage(extractAttributeFromMessage(exception.getMessage()), new String[]{},
                 localeService.getLocale());
-        final var message = messageSource.getMessage("repository.fieldCannotBeEmpty",  attributes.split(","),
+        final var message = messageSource.getMessage("repository.fieldCannotBeEmpty", attributes.split(","),
                 localeService.getLocale());
+        LOGGER.error(message, exception);
         return handleExceptionInternal(exception, new Error(message), new HttpHeaders(), HttpStatus.BAD_REQUEST, request);
     }
 
@@ -38,8 +43,9 @@ public class RestResponseEntityExceptionHandler extends ResponseEntityExceptionH
     public ResponseEntity<Object> handleAlreadyExistsFieldException(final AlreadyExistsFieldException exception, final WebRequest request) {
         final var attributes = messageSource.getMessage(extractAttributeFromMessage(exception.getMessage()), new String[]{},
                 localeService.getLocale());
-        final var message = messageSource.getMessage("repository.fieldAlreadyExists",  attributes.split(","),
+        final var message = messageSource.getMessage("repository.fieldAlreadyExists", attributes.split(","),
                 localeService.getLocale());
+        LOGGER.error(message, exception);
         return handleExceptionInternal(exception, new Error(message), new HttpHeaders(), HttpStatus.BAD_REQUEST, request);
     }
 
@@ -47,8 +53,9 @@ public class RestResponseEntityExceptionHandler extends ResponseEntityExceptionH
     public ResponseEntity<Object> handleNullFieldException(final NullFieldException exception, final WebRequest request) {
         final var attributes = messageSource.getMessage(extractAttributeFromMessage(exception.getMessage()), new String[]{},
                 localeService.getLocale());
-        final var message = messageSource.getMessage("repository.fieldCannotBeNull",  attributes.split(","),
+        final var message = messageSource.getMessage("repository.fieldCannotBeNull", attributes.split(","),
                 localeService.getLocale());
+        LOGGER.error(message, exception);
         return handleExceptionInternal(exception, new Error(message), new HttpHeaders(), HttpStatus.BAD_REQUEST, request);
     }
 
@@ -58,6 +65,7 @@ public class RestResponseEntityExceptionHandler extends ResponseEntityExceptionH
                 localeService.getLocale());
         final var message = messageSource.getMessage("repository.fieldCannotBeLessThanZero", attributes.split(","),
                 localeService.getLocale());
+        LOGGER.error(message, exception);
         return handleExceptionInternal(exception, new Error(message), new HttpHeaders(), HttpStatus.BAD_REQUEST, request);
     }
 
@@ -67,6 +75,7 @@ public class RestResponseEntityExceptionHandler extends ResponseEntityExceptionH
                 localeService.getLocale());
         final var message = messageSource.getMessage("repository.fieldCannotBeGreaterThan", attributes.split(","),
                 localeService.getLocale());
+        LOGGER.error(message, exception);
         return handleExceptionInternal(exception, new Error(message), new HttpHeaders(), HttpStatus.BAD_REQUEST, request);
     }
 
@@ -76,6 +85,7 @@ public class RestResponseEntityExceptionHandler extends ResponseEntityExceptionH
                 localeService.getLocale());
         final var message = messageSource.getMessage("repository.fieldCannotBeLessThan", attributes.split(","),
                 localeService.getLocale());
+        LOGGER.error(message, exception);
         return handleExceptionInternal(exception, new Error(message), new HttpHeaders(), HttpStatus.BAD_REQUEST, request);
     }
 
@@ -85,6 +95,7 @@ public class RestResponseEntityExceptionHandler extends ResponseEntityExceptionH
                 localeService.getLocale());
         final var message = messageSource.getMessage("repository.fieldIsInvalid", attributes.split(","),
                 localeService.getLocale());
+        LOGGER.error(message, exception);
         return handleExceptionInternal(exception, new Error(message), new HttpHeaders(), HttpStatus.BAD_REQUEST, request);
     }
 
@@ -94,6 +105,7 @@ public class RestResponseEntityExceptionHandler extends ResponseEntityExceptionH
                 localeService.getLocale());
         final var message = messageSource.getMessage("repository.notFoundRegister", attributes.split(","),
                 localeService.getLocale());
+        LOGGER.error(message, exception);
         return handleExceptionInternal(exception, new Error(message), new HttpHeaders(), HttpStatus.BAD_REQUEST, request);
     }
 
@@ -103,19 +115,22 @@ public class RestResponseEntityExceptionHandler extends ResponseEntityExceptionH
                 localeService.getLocale());
         final var message = messageSource.getMessage("security.accessDeniedToResource", attributes.split(","),
                 localeService.getLocale());
+        LOGGER.error(message, exception);
         return handleExceptionInternal(exception, new Error(message), new HttpHeaders(), HttpStatus.FORBIDDEN, request);
     }
 
     @ExceptionHandler(org.springframework.security.access.AccessDeniedException.class)
     public ResponseEntity<Object> handleAccessDeniedException(final org.springframework.security.access.AccessDeniedException exception,
                                                               final WebRequest request) {
-        return handleExceptionInternal(exception, new Error(this.messageSource.getMessage("security.accessDenied", null,
-                localeService.getLocale())), new HttpHeaders(), HttpStatus.FORBIDDEN, request);
+        final var message = this.messageSource.getMessage("security.accessDenied", null, localeService.getLocale());
+        LOGGER.error(message, exception);
+        return handleExceptionInternal(exception, new Error(message), new HttpHeaders(), HttpStatus.FORBIDDEN, request);
     }
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<Object> handleGenericException(final Exception exception, final WebRequest request) {
         final var message = messageSource.getMessage("repository.genericException", null, localeService.getLocale());
+        LOGGER.error(message, exception);
         return handleExceptionInternal(exception, new Error(message), new HttpHeaders(), HttpStatus.INTERNAL_SERVER_ERROR, request);
     }
 
