@@ -1,0 +1,45 @@
+stages:
+  - tests
+# - secret-detection
+# - quality-gate
+  - deploy
+
+variables:
+  MAVEN_OPTS: "-Dmaven.repo.local=.m2/repository"
+
+cache:
+  key: maven
+  paths:
+    - .m2/repository
+
+tests:
+  stage: tests
+  tags:
+    - common
+  script:
+    - mvn clean verify
+    - cat target/site/jacoco/index.html | grep -o 'Total[^%]*%' | sed 's/Total/Total Coverage:/'
+  coverage: '/\d+\%/'
+  artifacts:
+    when: always
+    paths:
+      - target/*.jar
+      - target/site/jacoco/
+    reports:
+      junit:
+        - target/surefire-reports/*.xml
+      coverage_report:
+        coverage_format: cobertura
+        path: target/site/jacoco/jacoco.xml
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+    - if: '$CI_COMMIT_BRANCH == "main" && $CI_PIPELINE_SOURCE == "push"'
+
+deploy:
+  stage: deploy
+  tags:
+    - common
+  script:
+    - mvn deploy -DskipTests
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "main" && $CI_PIPELINE_SOURCE == "push"'
