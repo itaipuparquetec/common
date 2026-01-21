@@ -29,24 +29,25 @@ public class RestResponseEntityExceptionHandlerTest {
     @Test
     void mustHandleAlreadyExistsFieldsException() {
         final Locale DEFAULT_LOCALE = Locale.of("pt", "BR");
-        final String errorMessageExpected = "Os campos campo1 e campo2 já existem.";
+        final String errorMessageExpected = "Os campos campo1, campo2 e campo3 já existem.";
         final String keyCodeOfMessageExpected = "repository.fieldsAlreadyExists";
-        final String joinedFieldsExpected = "field1,field2";
-        final String[] splitFieldsExpected = new String[]{"field1", "field2"};
-        final String translatedFieldsExpected = "campo1,campo2";
-        final String[] splitTranslatedFieldsExpected = new String[]{"campo1", "campo2"};
+        final String[] splitFieldsExpected = new String[]{"field1", "field2", "field3"};
         when(localeService.getLocale()).thenReturn(DEFAULT_LOCALE);
-        when(messageSource.getMessage(eq(joinedFieldsExpected), any(String[].class), eq(DEFAULT_LOCALE)))
-                .thenReturn(translatedFieldsExpected);
-        when(messageSource.getMessage(keyCodeOfMessageExpected, splitTranslatedFieldsExpected, DEFAULT_LOCALE))
+        when(messageSource.getMessage(eq("field1"), any(String[].class), eq(DEFAULT_LOCALE))).thenReturn("campo1");
+        when(messageSource.getMessage(eq("field2"), any(String[].class), eq(DEFAULT_LOCALE))).thenReturn("campo2");
+        when(messageSource.getMessage(eq("and"), any(String[].class), eq(DEFAULT_LOCALE))).thenReturn("e");
+        when(messageSource.getMessage(eq("field3"), any(String[].class), eq(DEFAULT_LOCALE))).thenReturn("campo3");
+        when(messageSource.getMessage(keyCodeOfMessageExpected, new String[]{"campo1, campo2 e campo3"}, DEFAULT_LOCALE))
                 .thenReturn(errorMessageExpected);
         final var exception = new AlreadyExistsFieldsException(splitFieldsExpected);
         final var webRequestExpected = Mockito.mock(WebRequest.class);
 
         restResponseEntityExceptionHandler.handleAlreadyExistsFieldsException(exception, webRequestExpected);
 
-        verify(messageSource).getMessage(eq(joinedFieldsExpected), any(String[].class), eq(DEFAULT_LOCALE));
-        verify(messageSource).getMessage(keyCodeOfMessageExpected, splitTranslatedFieldsExpected, DEFAULT_LOCALE);
+        verify(messageSource).getMessage(eq("field1"), any(String[].class), eq(DEFAULT_LOCALE));
+        verify(messageSource).getMessage(eq("field2"), any(String[].class), eq(DEFAULT_LOCALE));
+        verify(messageSource).getMessage(eq("field3"), any(String[].class), eq(DEFAULT_LOCALE));
+        verify(messageSource).getMessage(keyCodeOfMessageExpected, new String[]{"campo1, campo2 e campo3"}, DEFAULT_LOCALE);
         verify(restResponseEntityExceptionHandler).handleExceptionInternal(eq(exception), eq(errorMessageExpected),
                 any(HttpHeaders.class), eq(HttpStatus.BAD_REQUEST), eq(webRequestExpected));
     }

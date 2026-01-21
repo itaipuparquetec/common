@@ -6,12 +6,12 @@
 
     <groupId>br.org.itaipuparquetec</groupId>
     <artifactId>common</artifactId>
-    <version>2.1.0</version>
+    <version>2.2.0</version>
     <packaging>jar</packaging>
 
     <name>Common</name>
-    <description>Itaipu Parquetec Common</description>
-    <url>https://github.com/itaipuparquetec/common</url>
+    <description>Itaipu Parquetec - Fábrica de Software Java Common</description>
+    <url>https://git.itaipuparquetec.org.br/fabrica-de-software/common</url>
 
     <licenses>
         <license>
@@ -40,16 +40,11 @@
             <name>Leonardo Gabral Gomes</name>
             <email>leonardo.gomes@itaipuparquetec.org.br</email>
         </developer>
-
-        <developer>
-            <name>Francisco Machado Becker</name>
-            <email>francisco.becker@itaipuparquetec.org.br</email>
-        </developer>
     </developers>
 
     <scm>
-        <connection>scm:git:git://github.com/itaipuparquetec/common.git</connection>
-        <url>https://github.com/itaipuparquetec/common</url>
+        <connection>scm:git:git://git.itaipuparquetec.org.br/fabrica-de-software/common.git</connection>
+        <url>https://git.itaipuparquetec.org.br/fabrica-de-software/common</url>
     </scm>
 
     <properties>
