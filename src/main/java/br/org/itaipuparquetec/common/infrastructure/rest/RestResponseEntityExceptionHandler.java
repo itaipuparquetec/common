@@ -9,6 +9,7 @@ import org.springframework.context.MessageSource;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -47,6 +48,16 @@ public class RestResponseEntityExceptionHandler extends ResponseEntityExceptionH
                 localeService.getLocale());
         LOGGER.error(message, exception);
         return handleExceptionInternal(exception, new Error(message), new HttpHeaders(), HttpStatus.BAD_REQUEST, request);
+    }
+
+    @ExceptionHandler(AlreadyExistsFieldsException.class)
+    public ResponseEntity<Object> handleAlreadyExistsFieldsException(final AlreadyExistsFieldsException exception, final WebRequest request) {
+        final var attributes = messageSource.getMessage(extractAttributeFromMessage(exception.getMessage()), new String[]{},
+                localeService.getLocale());
+        final var messageOfError = messageSource.getMessage("repository.fieldsAlreadyExists", attributes.split(","),
+                localeService.getLocale());
+        LOGGER.error(messageOfError, exception);
+        return handleExceptionInternal(exception, messageOfError, new HttpHeaders(), HttpStatus.BAD_REQUEST, request);
     }
 
     @ExceptionHandler(NullFieldException.class)
@@ -132,6 +143,11 @@ public class RestResponseEntityExceptionHandler extends ResponseEntityExceptionH
         final var message = messageSource.getMessage("repository.genericException", null, localeService.getLocale());
         LOGGER.error(message, exception);
         return handleExceptionInternal(exception, new Error(message), new HttpHeaders(), HttpStatus.INTERNAL_SERVER_ERROR, request);
+    }
+
+    public ResponseEntity<Object> handleExceptionInternal(Exception exception, String messageOfError, HttpHeaders headers,
+                                                          HttpStatusCode statusCode, WebRequest webRequest) {
+        return super.handleExceptionInternal(exception, new Error(messageOfError), headers, statusCode, webRequest);
     }
 
     static String extractAttributeFromMessage(final String message) {

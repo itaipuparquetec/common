@@ -57,6 +57,12 @@ public class ExceptionBuilder {
         return this;
     }
 
+    public ExceptionBuilder whenAlreadyExists(boolean condition, String... fields) {
+        if (condition)
+            this.exceptions.add(new AlreadyExistsFieldsException(fields));
+        return this;
+    }
+
     public ExceptionBuilder whenNotFoundRegister(boolean condition, String field) {
         if (condition)
             this.exceptions.add(new NotFoundRegisterException(field));
