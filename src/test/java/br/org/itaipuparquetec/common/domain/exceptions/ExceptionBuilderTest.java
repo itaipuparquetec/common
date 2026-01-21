@@ -8,7 +8,8 @@ import org.junit.jupiter.params.provider.ValueSource;
 
 import java.util.stream.Stream;
 
-import static br.org.itaipuparquetec.common.domain.exceptions.AlreadyExistsFieldException.ALREADY_EXITS_MESSAGE;
+import static br.org.itaipuparquetec.common.domain.exceptions.AlreadyExistsFieldException.ALREADY_EXITS_FIELD_MESSAGE;
+import static br.org.itaipuparquetec.common.domain.exceptions.AlreadyExistsFieldsException.ALREADY_EXITS_FIELDS_MESSAGE;
 import static br.org.itaipuparquetec.common.domain.exceptions.EmptyFieldException.NOT_EMPTY_MESSAGE;
 import static br.org.itaipuparquetec.common.domain.exceptions.InvalidFieldException.INVALID_FIELD_MESSAGE;
 import static br.org.itaipuparquetec.common.domain.exceptions.LessThanZeroFieldException.LESS_THAN_ZERO_MESSAGE;
@@ -51,7 +52,7 @@ public class ExceptionBuilderTest {
                 .whenAlreadyExists(true, fieldName)
                 .thenThrows())
                 .isInstanceOf(AlreadyExistsFieldException.class)
-                .hasMessage(ALREADY_EXITS_MESSAGE.formatted(fieldName));
+                .hasMessage(ALREADY_EXITS_FIELD_MESSAGE.formatted(fieldName));
     }
 
     @Test
@@ -60,6 +61,29 @@ public class ExceptionBuilderTest {
 
         assertThatCode(() -> new ExceptionBuilder()
                 .whenAlreadyExists(false, fieldName)
+                .thenThrows())
+                .doesNotThrowAnyException();
+    }
+
+    @Test
+    void mustThrowAnAlreadyExistsFieldsExceptionWhenConditionIsTrue() {
+        final var nameField = "name";
+        final var phoneNumber = "phoneNumber";
+
+        assertThatThrownBy(() -> new ExceptionBuilder()
+                .whenAlreadyExists(true, nameField, phoneNumber)
+                .thenThrows())
+                .isInstanceOf(AlreadyExistsFieldsException.class)
+                .hasMessage(ALREADY_EXITS_FIELDS_MESSAGE.formatted(String.join(",", nameField, phoneNumber)));
+    }
+
+    @Test
+    void cannotThrowAnAlreadyExistsFieldsExceptionWhenConditionIsFalse() {
+        final var nameField = "name";
+        final var phoneNumber = "phoneNumber";
+
+        assertThatCode(() -> new ExceptionBuilder()
+                .whenAlreadyExists(false, nameField, phoneNumber)
                 .thenThrows())
                 .doesNotThrowAnyException();
     }
