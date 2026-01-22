@@ -2,6 +2,7 @@ package br.org.itaipuparquetec.common.infrastructure.rest;
 
 import br.org.itaipuparquetec.common.application.services.LocaleService;
 import br.org.itaipuparquetec.common.domain.exceptions.*;
+import br.org.itaipuparquetec.common.infrastructure.formatters.FieldFormatter;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,6 +18,7 @@ import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Pattern;
 
@@ -52,12 +54,32 @@ public class RestResponseEntityExceptionHandler extends ResponseEntityExceptionH
 
     @ExceptionHandler(AlreadyExistsFieldsException.class)
     public ResponseEntity<Object> handleAlreadyExistsFieldsException(final AlreadyExistsFieldsException exception, final WebRequest request) {
-        final var attributes = messageSource.getMessage(extractAttributeFromMessage(exception.getMessage()), new String[]{},
-                localeService.getLocale());
-        final var messageOfError = messageSource.getMessage("repository.fieldsAlreadyExists", attributes.split(","),
-                localeService.getLocale());
+        final var rawAttributes = extractAttributeFromMessage(exception.getMessage()).split(",");
+
+        final var rawTranslatedAttributes = getTranslatedAttributes(rawAttributes);
+
+        final var formattedTranslatedAttributes = getFormattedTranslatedAttributes(rawTranslatedAttributes);
+
+        final var messageOfError = messageSource.getMessage("repository.fieldsAlreadyExists",
+                new String[]{formattedTranslatedAttributes}, localeService.getLocale());
         LOGGER.error(messageOfError, exception);
         return handleExceptionInternal(exception, messageOfError, new HttpHeaders(), HttpStatus.BAD_REQUEST, request);
+    }
+
+    private String[] getTranslatedAttributes(String[] rawAttributes) {
+        return Arrays.stream(rawAttributes).map(String::trim)
+                .map(rawAttribute -> messageSource.getMessage(rawAttribute, new String[]{}, localeService.getLocale()))
+                .toArray(String[]::new);
+    }
+
+    private String getConjunction() {
+        return messageSource.getMessage("and", new String[]{}, localeService.getLocale());
+    }
+
+    public String getFormattedTranslatedAttributes(String[] rawTranslatedAttributes) {
+        final var conjunction = getConjunction();
+
+        return FieldFormatter.format(conjunction, rawTranslatedAttributes);
     }
 
     @ExceptionHandler(NullFieldException.class)
@@ -133,14 +155,14 @@ public class RestResponseEntityExceptionHandler extends ResponseEntityExceptionH
     @ExceptionHandler(org.springframework.security.access.AccessDeniedException.class)
     public ResponseEntity<Object> handleAccessDeniedException(final org.springframework.security.access.AccessDeniedException exception,
                                                               final WebRequest request) {
-        final var message = this.messageSource.getMessage("security.accessDenied", null, localeService.getLocale());
+        final var message = this.messageSource.getMessage("security.accessDenied", new String[]{}, localeService.getLocale());
         LOGGER.error(message, exception);
         return handleExceptionInternal(exception, new Error(message), new HttpHeaders(), HttpStatus.FORBIDDEN, request);
     }
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<Object> handleGenericException(final Exception exception, final WebRequest request) {
-        final var message = messageSource.getMessage("repository.genericException", null, localeService.getLocale());
+        final var message = messageSource.getMessage("repository.genericException", new String[]{}, localeService.getLocale());
         LOGGER.error(message, exception);
         return handleExceptionInternal(exception, new Error(message), new HttpHeaders(), HttpStatus.INTERNAL_SERVER_ERROR, request);
     }
