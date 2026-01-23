@@ -11,6 +11,7 @@ import java.util.stream.Stream;
 import static br.org.itaipuparquetec.common.domain.exceptions.AlreadyExistsFieldException.ALREADY_EXITS_FIELD_MESSAGE;
 import static br.org.itaipuparquetec.common.domain.exceptions.AlreadyExistsFieldsException.ALREADY_EXITS_FIELDS_MESSAGE;
 import static br.org.itaipuparquetec.common.domain.exceptions.EmptyFieldException.NOT_EMPTY_MESSAGE;
+import static br.org.itaipuparquetec.common.domain.exceptions.ForbiddenException.ACCESS_DENIED_MESSAGE;
 import static br.org.itaipuparquetec.common.domain.exceptions.InvalidFieldException.INVALID_FIELD_MESSAGE;
 import static br.org.itaipuparquetec.common.domain.exceptions.LessThanZeroFieldException.LESS_THAN_ZERO_MESSAGE;
 import static br.org.itaipuparquetec.common.domain.exceptions.NotFoundRegisterException.NOT_FOUND_REGISTER_MESSAGE;
@@ -42,6 +43,17 @@ public class ExceptionBuilderTest {
                 .thenThrows())
                 .isInstanceOf(InvalidFieldException.class)
                 .hasMessage(INVALID_FIELD_MESSAGE.formatted(fieldName));
+    }
+
+    @Test
+    void mustThrowAForbiddenExceptionWhenConditionIsTrue() {
+        final var fieldName = "name";
+
+        assertThatThrownBy(() -> new ExceptionBuilder()
+                .whenForbiddenAccess(true, fieldName)
+                .thenThrows())
+                .isInstanceOf(ForbiddenException.class)
+                .hasMessage(ACCESS_DENIED_MESSAGE.formatted(fieldName));
     }
 
     @Test
@@ -115,6 +127,16 @@ public class ExceptionBuilderTest {
 
         assertThatCode(() -> new ExceptionBuilder()
                 .when(false, fieldName)
+                .thenThrows())
+                .doesNotThrowAnyException();
+    }
+
+    @Test
+    void cannotThrowAForbiddenExceptionWhenConditionIsFalse() {
+        final var fieldName = "name";
+
+        assertThatCode(() -> new ExceptionBuilder()
+                .whenForbiddenAccess(false, fieldName)
                 .thenThrows())
                 .doesNotThrowAnyException();
     }
@@ -309,6 +331,106 @@ public class ExceptionBuilderTest {
                 Arguments.of(0, 1),
                 Arguments.of(-5, 3),
                 Arguments.of(-5, -2)
+        );
+    }
+
+    @ParameterizedTest
+    @MethodSource("provideStringToThrowExceptionWhenStringIsGreaterThan")
+    void mustThrowAnExceptionWhenTheStringIsGreaterThan(String value, int maxSize) {
+        final var field = "age";
+
+        assertThatThrownBy(() -> new ExceptionBuilder()
+                .whenStringSizeGreaterThan(value, maxSize, field)
+                .thenThrows())
+                .isInstanceOf(TooLargeFieldException.class)
+                .hasMessage(TO_LARGE_FIELD_MESSAGE.formatted(field, maxSize));
+    }
+
+    @Test
+    void mustNotThrowAnyExceptionWhenValidatingTheStringIsGreaterThanWithNullValue() {
+        final var field = "age";
+        final int max = 1;
+
+        assertThatCode(() -> new ExceptionBuilder()
+                .whenStringSizeGreaterThan(null, max, field)
+                .thenThrows())
+                .doesNotThrowAnyException();
+    }
+
+    @ParameterizedTest
+    @MethodSource("provideStringToDontThrowExceptionWhenStringIsGreaterThan")
+    void cannotThrowAnExceptionWhenTheStringIsEqualsOrLessThanMaxSize(String value, int maxSize) {
+        final var field = "age";
+
+        assertThatCode(() -> new ExceptionBuilder()
+                .whenStringSizeGreaterThan(value, maxSize, field)
+                .thenThrows())
+                .doesNotThrowAnyException();
+    }
+
+    private static Stream<Arguments> provideStringToThrowExceptionWhenStringIsGreaterThan() {
+        return Stream.of(
+                Arguments.of("aaaaaaaaaaa", 10),
+                Arguments.of("aa", 1),
+                Arguments.of("a", 0),
+                Arguments.of("", -5)
+        );
+    }
+
+    private static Stream<Arguments> provideStringToDontThrowExceptionWhenStringIsGreaterThan() {
+        return Stream.of(
+                Arguments.of("aaaaaaaaaa", 10),
+                Arguments.of("a", 1),
+                Arguments.of("", 0)
+        );
+    }
+
+    @ParameterizedTest
+    @MethodSource("provideStringToThrowExceptionWhenStringIsLessThan")
+    void mustThrowAnExceptionWhenTheStringIsLessThan(String value, int minSize) {
+        final var field = "age";
+
+        assertThatThrownBy(() -> new ExceptionBuilder()
+                .whenStringSizeLessThan(value, minSize, field)
+                .thenThrows())
+                .isInstanceOf(TooShortFieldException.class)
+                .hasMessage(TO_SHORT_FIELD_MESSAGE.formatted(field, minSize));
+    }
+
+    @Test
+    void mustNotThrowAnyExceptionWhenValidatingTheStringIsLessThanWithNullValue() {
+        final var field = "age";
+        final int max = 1;
+
+        assertThatCode(() -> new ExceptionBuilder()
+                .whenStringSizeLessThan(null, max, field)
+                .thenThrows())
+                .doesNotThrowAnyException();
+    }
+
+    @ParameterizedTest
+    @MethodSource("provideStringToDontThrowExceptionWhenStringIsGreaterThan")
+    void cannotThrowAnExceptionWhenTheStringIsEqualsOrLessThanMinSize(String value, int minSize) {
+        final var field = "age";
+
+        assertThatCode(() -> new ExceptionBuilder()
+                .whenStringSizeLessThan(value, minSize, field)
+                .thenThrows())
+                .doesNotThrowAnyException();
+    }
+
+    private static Stream<Arguments> provideStringToThrowExceptionWhenStringIsLessThan() {
+        return Stream.of(
+                Arguments.of("aaaaaaaaa", 10),
+                Arguments.of("aa", 3)
+        );
+    }
+
+    private static Stream<Arguments> provideStringToDontThrowExceptionWhenStringIsLessThan() {
+        return Stream.of(
+                Arguments.of("aaaaaaaaaa", 10),
+                Arguments.of("a", 1),
+                Arguments.of("", 0)
         );
     }
 }

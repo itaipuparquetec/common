@@ -6,7 +6,7 @@
 
     <groupId>br.org.itaipuparquetec</groupId>
     <artifactId>common</artifactId>
-    <version>2.2.0</version>
+    <version>2.3.0</version>
     <packaging>jar</packaging>
 
     <name>Common</name>
@@ -194,27 +194,27 @@
                                         <limit>
                                             <counter>INSTRUCTION</counter>
                                             <value>COVEREDRATIO</value>
-                                            <minimum>0.33</minimum>
+                                            <minimum>0.78</minimum>
                                         </limit>
                                         <limit>
                                             <counter>CLASS</counter>
                                             <value>COVEREDRATIO</value>
-                                            <minimum>0.5</minimum>
+                                            <minimum>0.61</minimum>
                                         </limit>
                                         <limit>
                                             <counter>LINE</counter>
                                             <value>COVEREDRATIO</value>
-                                            <minimum>0.35</minimum>
+                                            <minimum>0.71</minimum>
                                         </limit>
                                         <limit>
                                             <counter>METHOD</counter>
                                             <value>COVEREDRATIO</value>
-                                            <minimum>0.31</minimum>
+                                            <minimum>0.57</minimum>
                                         </limit>
                                         <limit>
                                             <counter>BRANCH</counter>
                                             <value>COVEREDRATIO</value>
-                                            <minimum>0.76</minimum>
+                                            <minimum>0.83</minimum>
                                         </limit>
                                     </limits>
                                 </rule>
