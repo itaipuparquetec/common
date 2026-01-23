@@ -45,6 +45,18 @@ public class ExceptionBuilder {
         return this;
     }
 
+    public ExceptionBuilder whenStringSizeGreaterThan(String value, int maxSize, String field){
+        if (value != null && value.length() > maxSize)
+            this.exceptions.add(new TooLargeFieldException(field, maxSize));
+        return this;
+    }
+
+    public ExceptionBuilder whenStringSizeLessThan(String value, int maxSize, String field){
+        if (value != null && value.length() < maxSize)
+            this.exceptions.add(new TooShortFieldException(field, maxSize));
+        return this;
+    }
+
     public ExceptionBuilder whenLessThanZero(Integer value, String field) {
         if (value != null && value < 0)
             this.exceptions.add(new LessThanZeroFieldException(field));
@@ -69,8 +81,14 @@ public class ExceptionBuilder {
         return this;
     }
 
-    public ExceptionBuilder when(boolean condicao, String field) {
-        if (condicao)
+    public ExceptionBuilder whenForbiddenAccess(boolean condition, String field) {
+        if (condition)
+            this.exceptions.add(new ForbiddenException(field));
+        return this;
+    }
+    
+    public ExceptionBuilder when(boolean condition, String field) {
+        if (condition)
             this.exceptions.add(new InvalidFieldException(field));
         return this;
     }

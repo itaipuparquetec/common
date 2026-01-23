@@ -1,7 +1,7 @@
 package br.org.itaipuparquetec.common.infrastructure.rest;
 
 import br.org.itaipuparquetec.common.application.services.LocaleService;
-import br.org.itaipuparquetec.common.domain.exceptions.AlreadyExistsFieldsException;
+import br.org.itaipuparquetec.common.domain.exceptions.*;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -42,7 +42,7 @@ public class RestResponseEntityExceptionHandlerTest {
         final var exception = new AlreadyExistsFieldsException(splitFieldsExpected);
         final var webRequestExpected = Mockito.mock(WebRequest.class);
 
-        restResponseEntityExceptionHandler.handleAlreadyExistsFieldsException(exception, webRequestExpected);
+        restResponseEntityExceptionHandler.handleException(exception, webRequestExpected);
 
         verify(messageSource).getMessage(eq("field1"), any(String[].class), eq(DEFAULT_LOCALE));
         verify(messageSource).getMessage(eq("field2"), any(String[].class), eq(DEFAULT_LOCALE));
@@ -69,5 +69,232 @@ public class RestResponseEntityExceptionHandlerTest {
                 Arguments.of("   \"Attribute1\",   \"Attribute2\",   \"Attribute3\"   ", "Attribute1,Attribute2,Attribute3"),
                 Arguments.of("   \"Attribute1\", message  \"Attribute2\", message \"Attribute3\"   ", "Attribute1,Attribute2,Attribute3")
         );
+    }
+
+    @Test
+    void mustHandleEmptyFieldException() {
+        final String attribute = "field1";
+        final String keyCodeOfMessageExpected = "repository.fieldCannotBeEmpty";
+        final var exception = new EmptyFieldException(attribute);
+        final Locale DEFAULT_LOCALE = Locale.of("pt", "BR");
+        when(localeService.getLocale()).thenReturn(DEFAULT_LOCALE);
+        when(messageSource.getMessage(eq(attribute), any(String[].class), eq(DEFAULT_LOCALE))).thenReturn("campo1");
+        final String errorMessageExpected = "Error expected.";
+        when(messageSource.getMessage(keyCodeOfMessageExpected, new String[]{"campo1"}, DEFAULT_LOCALE))
+                .thenReturn(errorMessageExpected);
+        final var webRequestExpected = Mockito.mock(WebRequest.class);
+
+        restResponseEntityExceptionHandler.handleException(exception, webRequestExpected);
+
+        verify(messageSource).getMessage(eq("field1"), any(String[].class), eq(DEFAULT_LOCALE));
+        verify(messageSource).getMessage(keyCodeOfMessageExpected, new String[]{"campo1"}, DEFAULT_LOCALE);
+        verify(restResponseEntityExceptionHandler).handleExceptionInternal(eq(exception), eq(errorMessageExpected),
+                any(HttpHeaders.class), eq(HttpStatus.BAD_REQUEST), eq(webRequestExpected));
+    }
+
+    @Test
+    void mustHandleAlreadyExistsFieldException() {
+        final String attribute = "field1";
+        final String keyCodeOfMessageExpected = "repository.fieldAlreadyExists";
+        final var exception = new AlreadyExistsFieldException(attribute);
+        final Locale DEFAULT_LOCALE = Locale.of("pt", "BR");
+        when(localeService.getLocale()).thenReturn(DEFAULT_LOCALE);
+        when(messageSource.getMessage(eq(attribute), any(String[].class), eq(DEFAULT_LOCALE))).thenReturn("campo1");
+        final String errorMessageExpected = "Error expected.";
+        when(messageSource.getMessage(keyCodeOfMessageExpected, new String[]{"campo1"}, DEFAULT_LOCALE))
+                .thenReturn(errorMessageExpected);
+        final var webRequestExpected = Mockito.mock(WebRequest.class);
+
+        restResponseEntityExceptionHandler.handleException(exception, webRequestExpected);
+
+        verify(messageSource).getMessage(eq("field1"), any(String[].class), eq(DEFAULT_LOCALE));
+        verify(messageSource).getMessage(keyCodeOfMessageExpected, new String[]{"campo1"}, DEFAULT_LOCALE);
+        verify(restResponseEntityExceptionHandler).handleExceptionInternal(eq(exception), eq(errorMessageExpected),
+                any(HttpHeaders.class), eq(HttpStatus.BAD_REQUEST), eq(webRequestExpected));
+    }
+
+    @Test
+    void mustHandleNullFieldException() {
+        final String attribute = "field1";
+        final String keyCodeOfMessageExpected = "repository.fieldCannotBeNull";
+        final var exception = new NullFieldException(attribute);
+        final Locale DEFAULT_LOCALE = Locale.of("pt", "BR");
+        when(localeService.getLocale()).thenReturn(DEFAULT_LOCALE);
+        when(messageSource.getMessage(eq(attribute), any(String[].class), eq(DEFAULT_LOCALE))).thenReturn("campo1");
+        final String errorMessageExpected = "Error expected.";
+        when(messageSource.getMessage(keyCodeOfMessageExpected, new String[]{"campo1"}, DEFAULT_LOCALE))
+                .thenReturn(errorMessageExpected);
+        final var webRequestExpected = Mockito.mock(WebRequest.class);
+
+        restResponseEntityExceptionHandler.handleException(exception, webRequestExpected);
+
+        verify(messageSource).getMessage(eq("field1"), any(String[].class), eq(DEFAULT_LOCALE));
+        verify(messageSource).getMessage(keyCodeOfMessageExpected, new String[]{"campo1"}, DEFAULT_LOCALE);
+        verify(restResponseEntityExceptionHandler).handleExceptionInternal(eq(exception), eq(errorMessageExpected),
+                any(HttpHeaders.class), eq(HttpStatus.BAD_REQUEST), eq(webRequestExpected));
+    }
+
+    @Test
+    void mustHandleLessThanZeroFieldException() {
+        final String attribute = "field1";
+        final String keyCodeOfMessageExpected = "repository.fieldCannotBeLessThanZero";
+        final var exception = new LessThanZeroFieldException(attribute);
+        final Locale DEFAULT_LOCALE = Locale.of("pt", "BR");
+        when(localeService.getLocale()).thenReturn(DEFAULT_LOCALE);
+        when(messageSource.getMessage(eq(attribute), any(String[].class), eq(DEFAULT_LOCALE))).thenReturn("campo1");
+        final String errorMessageExpected = "Error expected.";
+        when(messageSource.getMessage(keyCodeOfMessageExpected, new String[]{"campo1"}, DEFAULT_LOCALE))
+                .thenReturn(errorMessageExpected);
+        final var webRequestExpected = Mockito.mock(WebRequest.class);
+
+        restResponseEntityExceptionHandler.handleException(exception, webRequestExpected);
+
+        verify(messageSource).getMessage(eq("field1"), any(String[].class), eq(DEFAULT_LOCALE));
+        verify(messageSource).getMessage(keyCodeOfMessageExpected, new String[]{"campo1"}, DEFAULT_LOCALE);
+        verify(restResponseEntityExceptionHandler).handleExceptionInternal(eq(exception), eq(errorMessageExpected),
+                any(HttpHeaders.class), eq(HttpStatus.BAD_REQUEST), eq(webRequestExpected));
+    }
+
+    @Test
+    void mustHandleTooLargeFieldException() {
+        final String attribute = "field1";
+        final String keyCodeOfMessageExpected = "repository.fieldCannotBeGreaterThan";
+        final var exception = new TooLargeFieldException(attribute, 100);
+        final Locale DEFAULT_LOCALE = Locale.of("pt", "BR");
+        when(localeService.getLocale()).thenReturn(DEFAULT_LOCALE);
+        when(messageSource.getMessage(eq(attribute + ",100"), any(String[].class), eq(DEFAULT_LOCALE)))
+                .thenReturn("campo1", "100");
+        final String errorMessageExpected = "Error expected.";
+        when(messageSource.getMessage(keyCodeOfMessageExpected, new String[]{"campo1"}, DEFAULT_LOCALE))
+                .thenReturn(errorMessageExpected);
+        final var webRequestExpected = Mockito.mock(WebRequest.class);
+
+        restResponseEntityExceptionHandler.handleException(exception, webRequestExpected);
+
+        verify(messageSource).getMessage(eq("field1,100"), any(String[].class), eq(DEFAULT_LOCALE));
+        verify(messageSource).getMessage(keyCodeOfMessageExpected, new String[]{"campo1"}, DEFAULT_LOCALE);
+        verify(restResponseEntityExceptionHandler).handleExceptionInternal(eq(exception), eq(errorMessageExpected),
+                any(HttpHeaders.class), eq(HttpStatus.BAD_REQUEST), eq(webRequestExpected));
+    }
+
+    @Test
+    void mustHandleTooShortFieldException() {
+        final String attribute = "field1";
+        final String keyCodeOfMessageExpected = "repository.fieldCannotBeLessThan";
+        final var exception = new TooShortFieldException(attribute, 100);
+        final Locale DEFAULT_LOCALE = Locale.of("pt", "BR");
+        when(localeService.getLocale()).thenReturn(DEFAULT_LOCALE);
+        when(messageSource.getMessage(eq(attribute + ",100"), any(String[].class), eq(DEFAULT_LOCALE)))
+                .thenReturn("campo1", "100");
+        final String errorMessageExpected = "Error expected.";
+        when(messageSource.getMessage(keyCodeOfMessageExpected, new String[]{"campo1"}, DEFAULT_LOCALE))
+                .thenReturn(errorMessageExpected);
+        final var webRequestExpected = Mockito.mock(WebRequest.class);
+
+        restResponseEntityExceptionHandler.handleException(exception, webRequestExpected);
+
+        verify(messageSource).getMessage(eq("field1,100"), any(String[].class), eq(DEFAULT_LOCALE));
+        verify(messageSource).getMessage(keyCodeOfMessageExpected, new String[]{"campo1"}, DEFAULT_LOCALE);
+        verify(restResponseEntityExceptionHandler).handleExceptionInternal(eq(exception), eq(errorMessageExpected),
+                any(HttpHeaders.class), eq(HttpStatus.BAD_REQUEST), eq(webRequestExpected));
+    }
+
+    @Test
+    void mustHandleInvalidFieldException() {
+        final String attribute = "field1";
+        final String keyCodeOfMessageExpected = "repository.fieldIsInvalid";
+        final var exception = new InvalidFieldException(attribute);
+        final Locale DEFAULT_LOCALE = Locale.of("pt", "BR");
+        when(localeService.getLocale()).thenReturn(DEFAULT_LOCALE);
+        when(messageSource.getMessage(eq(attribute), any(String[].class), eq(DEFAULT_LOCALE))).thenReturn("campo1");
+        final String errorMessageExpected = "Error expected.";
+        when(messageSource.getMessage(keyCodeOfMessageExpected, new String[]{"campo1"}, DEFAULT_LOCALE))
+                .thenReturn(errorMessageExpected);
+        final var webRequestExpected = Mockito.mock(WebRequest.class);
+
+        restResponseEntityExceptionHandler.handleException(exception, webRequestExpected);
+
+        verify(messageSource).getMessage(eq("field1"), any(String[].class), eq(DEFAULT_LOCALE));
+        verify(messageSource).getMessage(keyCodeOfMessageExpected, new String[]{"campo1"}, DEFAULT_LOCALE);
+        verify(restResponseEntityExceptionHandler).handleExceptionInternal(eq(exception), eq(errorMessageExpected),
+                any(HttpHeaders.class), eq(HttpStatus.BAD_REQUEST), eq(webRequestExpected));
+    }
+
+    @Test
+    void mustHandleNotFoundRegisterException() {
+        final String attribute = "field1";
+        final String keyCodeOfMessageExpected = "repository.notFoundRegister";
+        final var exception = new NotFoundRegisterException(attribute);
+        final Locale DEFAULT_LOCALE = Locale.of("pt", "BR");
+        when(localeService.getLocale()).thenReturn(DEFAULT_LOCALE);
+        when(messageSource.getMessage(eq(attribute), any(String[].class), eq(DEFAULT_LOCALE))).thenReturn("campo1");
+        final String errorMessageExpected = "Error expected.";
+        when(messageSource.getMessage(keyCodeOfMessageExpected, new String[]{"campo1"}, DEFAULT_LOCALE))
+                .thenReturn(errorMessageExpected);
+        final var webRequestExpected = Mockito.mock(WebRequest.class);
+
+        restResponseEntityExceptionHandler.handleException(exception, webRequestExpected);
+
+        verify(messageSource).getMessage(eq("field1"), any(String[].class), eq(DEFAULT_LOCALE));
+        verify(messageSource).getMessage(keyCodeOfMessageExpected, new String[]{"campo1"}, DEFAULT_LOCALE);
+        verify(restResponseEntityExceptionHandler).handleExceptionInternal(eq(exception), eq(errorMessageExpected),
+                any(HttpHeaders.class), eq(HttpStatus.BAD_REQUEST), eq(webRequestExpected));
+    }
+
+    @Test
+    void mustHandleForbiddenException() {
+        final String attribute = "field1";
+        final String keyCodeOfMessageExpected = "security.accessDeniedToResource";
+        final var exception = new ForbiddenException(attribute);
+        final Locale DEFAULT_LOCALE = Locale.of("pt", "BR");
+        when(localeService.getLocale()).thenReturn(DEFAULT_LOCALE);
+        when(messageSource.getMessage(eq(attribute), any(String[].class), eq(DEFAULT_LOCALE))).thenReturn("campo1");
+        final String errorMessageExpected = "Error expected.";
+        when(messageSource.getMessage(keyCodeOfMessageExpected, new String[]{"campo1"}, DEFAULT_LOCALE))
+                .thenReturn(errorMessageExpected);
+        final var webRequestExpected = Mockito.mock(WebRequest.class);
+
+        restResponseEntityExceptionHandler.handleException(exception, webRequestExpected);
+
+        verify(messageSource).getMessage(eq("field1"), any(String[].class), eq(DEFAULT_LOCALE));
+        verify(messageSource).getMessage(keyCodeOfMessageExpected, new String[]{"campo1"}, DEFAULT_LOCALE);
+        verify(restResponseEntityExceptionHandler).handleExceptionInternal(eq(exception), eq(errorMessageExpected),
+                any(HttpHeaders.class), eq(HttpStatus.FORBIDDEN), eq(webRequestExpected));
+    }
+
+    @Test
+    void mustHandleAccessDeniedException() {
+        final String keyCodeOfMessageExpected = "security.accessDenied";
+        final var exception = new org.springframework.security.access.AccessDeniedException("Access is denied");
+        final Locale DEFAULT_LOCALE = Locale.of("pt", "BR");
+        when(localeService.getLocale()).thenReturn(DEFAULT_LOCALE);
+        final String errorMessageExpected = "Error expected.";
+        when(messageSource.getMessage(keyCodeOfMessageExpected, new String[]{}, DEFAULT_LOCALE))
+                .thenReturn(errorMessageExpected);
+        final var webRequestExpected = Mockito.mock(WebRequest.class);
+
+        restResponseEntityExceptionHandler.handleException(exception, webRequestExpected);
+
+        verify(messageSource).getMessage(keyCodeOfMessageExpected, new String[]{}, DEFAULT_LOCALE);
+        verify(restResponseEntityExceptionHandler).handleExceptionInternal(eq(exception), eq(errorMessageExpected),
+                any(HttpHeaders.class), eq(HttpStatus.FORBIDDEN), eq(webRequestExpected));
+    }
+
+    @Test
+    void mustHandleGenericException() {
+        final String keyCodeOfMessageExpected = "repository.genericException";
+        final var exception = new Exception("Generic Exception");
+        final Locale DEFAULT_LOCALE = Locale.of("pt", "BR");
+        when(localeService.getLocale()).thenReturn(DEFAULT_LOCALE);
+        final String errorMessageExpected = "Error expected.";
+        when(messageSource.getMessage(keyCodeOfMessageExpected, new String[]{}, DEFAULT_LOCALE))
+                .thenReturn(errorMessageExpected);
+        final var webRequestExpected = Mockito.mock(WebRequest.class);
+
+        restResponseEntityExceptionHandler.handleGenericException(exception, webRequestExpected);
+
+        verify(messageSource).getMessage(keyCodeOfMessageExpected, new String[]{}, DEFAULT_LOCALE);
+        verify(restResponseEntityExceptionHandler).handleExceptionInternal(eq(exception), eq(errorMessageExpected),
+                any(HttpHeaders.class), eq(HttpStatus.INTERNAL_SERVER_ERROR), eq(webRequestExpected));
     }
 }
