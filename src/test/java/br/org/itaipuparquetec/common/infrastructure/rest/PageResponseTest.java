@@ -1,5 +1,6 @@
 package br.org.itaipuparquetec.common.infrastructure.rest;
 
+import br.org.itaipuparquetec.common.domain.exceptions.NullFieldException;
 import org.junit.jupiter.api.Test;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -14,8 +15,8 @@ class PageResponseTest {
     @Test
     void shouldThrowExceptionWhenPageIsNull() {
         assertThatThrownBy(() -> new PageResponse<>(null))
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessage("Page must not be null");
+                .isInstanceOf(NullFieldException.class)
+                .hasMessage("The field \"page\" cannot be null.");
     }
 
     @Test

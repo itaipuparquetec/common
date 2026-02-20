@@ -1,16 +1,17 @@
 package br.org.itaipuparquetec.common.infrastructure.rest;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import br.org.itaipuparquetec.common.domain.exceptions.ExceptionBuilder;
 import org.springframework.data.domain.Page;
-import org.springframework.util.Assert;
 
 import java.util.List;
 import java.util.Objects;
 
-public record PageResponse<T>(Page<T> page) {
+public record PageResponse<T>(@JsonProperty @JsonIgnore Page<T> page) {
 
     public PageResponse {
-        Assert.notNull(page, "Page must not be null");
+        new ExceptionBuilder().whenNull(page, "page").thenThrows();
     }
 
     @JsonProperty
