@@ -57,7 +57,7 @@ deploy:
   tags:
     - common
   needs:
-    - job: tests
+    - job: quality-gate
       artifacts: true
   script:
     - mvn deploy -DskipTests
