@@ -5,11 +5,11 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>br.org.itaipuparquetec</groupId>
-    <artifactId>common</artifactId>
-    <version>2.4.1</version>
+    <artifactId>java-common</artifactId>
+    <version>2.5.1</version>
     <packaging>jar</packaging>
 
-    <name>Common</name>
+    <name>java-common</name>
     <description>Itaipu Parquetec - Fábrica de Software Java Common</description>
     <url>https://git.itaipuparquetec.org.br/fabrica-de-software/common</url>
 
@@ -53,14 +53,14 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
         <lombok.version>1.18.38</lombok.version>
-        <assertj.version>3.26.3</assertj.version>
+        <assertj.version>3.27.7</assertj.version>
         <junit-jupiter-api.version>6.0.1</junit-jupiter-api.version>
         <jackson-annotations.version>2.18.2</jackson-annotations.version>
         <junit-jupiter-params.version>6.0.1</junit-jupiter-params.version>
         <jakarta.validation-api.version>3.1.1</jakarta.validation-api.version>
         <jakarta.persistence-api.version>3.2.0</jakarta.persistence-api.version>
         <spring-data-hibernate-envers.version>4.0.0-M5</spring-data-hibernate-envers.version>
-        <spring-boot-starter.version>3.4.6</spring-boot-starter.version>
+        <spring-boot-starter.version>3.5.11</spring-boot-starter.version>
 
         <maven-surefire-report-plugin.version>3.5.4</maven-surefire-report-plugin.version>
         <jacoco-maven-plugin.version>0.8.13</jacoco-maven-plugin.version>
@@ -68,6 +68,9 @@
         <maven-source-plugin.version>3.3.0</maven-source-plugin.version>
         <maven-javadoc-plugin.version>3.6.3</maven-javadoc-plugin.version>
         <mockito-core.version>5.21.0</mockito-core.version>
+
+        <sonar-maven-plugin.version>3.11.0.3922</sonar-maven-plugin.version>
+        <sonar.java.binaries>target/classes</sonar.java.binaries>
     </properties>
 
     <dependencies>
@@ -156,6 +159,12 @@
 
     <build>
         <plugins>
+            <plugin>
+                <groupId>org.sonarsource.scanner.maven</groupId>
+                <artifactId>sonar-maven-plugin</artifactId>
+                <version>${sonar-maven-plugin.version}</version>
+            </plugin>
+
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-report-plugin</artifactId>

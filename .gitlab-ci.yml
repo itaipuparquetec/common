@@ -1,7 +1,7 @@
 stages:
   - tests
 # - secret-detection
-# - quality-gate
+  - quality-gate
   - deploy
 
 variables:
@@ -14,6 +14,7 @@ cache:
 
 tests:
   stage: tests
+  image: maven:3.9.9-eclipse-temurin-21
   tags:
     - common
   script:
@@ -22,9 +23,10 @@ tests:
   coverage: '/\d+\%/'
   artifacts:
     when: always
+    expire_in: 3 days
     paths:
+      - target/
       - target/*.jar
-      - target/site/jacoco/
     reports:
       junit:
         - target/surefire-reports/*.xml
@@ -35,10 +37,50 @@ tests:
     - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
     - if: '$CI_COMMIT_BRANCH == "main" && $CI_PIPELINE_SOURCE == "push"'
 
-deploy:
-  stage: deploy
+quality-gate:
+  stage: quality-gate
+  image: maven:3.9.9-eclipse-temurin-21
   tags:
     - common
+  needs:
+    - job: tests
+      artifacts: true
+  script:
+    - mvn sonar:sonar
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+    - if: '$CI_COMMIT_BRANCH == "main" && $CI_PIPELINE_SOURCE == "push"'
+
+deploy:
+  stage: deploy
+  image: maven:3.9.9-eclipse-temurin-21
+  tags:
+    - common
+  needs:
+    - job: quality-gate
+      artifacts: true
+  before_script:
+    - mkdir -p ~/.m2
+    - |
+      cat <<EOF > ~/.m2/settings.xml
+      <settings xmlns="http://maven.apache.org/SETTINGS/1.0.0"
+          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:schemaLocation="http://maven.apache.org/SETTINGS/1.0.0
+                              https://maven.apache.org/xsd/settings-1.0.0.xsd">
+        <servers>
+          <server>
+            <id>maven-snapshots</id>
+            <username>${MAVEN_REPO_USER}</username>
+            <password>${MAVEN_REPO_PASSWORD}</password>
+          </server>
+          <server>
+            <id>maven-releases</id>
+            <username>${MAVEN_REPO_USER}</username>
+            <password>${MAVEN_REPO_PASSWORD}</password>
+          </server>
+        </servers>
+      </settings>
+      EOF
   script:
     - mvn deploy -DskipTests
   rules:
