@@ -7,9 +7,11 @@ public class TrackingEntityRevisionListener implements EntityTrackingRevisionLis
 
     @Override
     public void newRevision(final Object revisionEntity) {
+        throw new NotImplementedException("Not implemented yet");
     }
 
     @Override
     public void entityChanged(Class entityClass, String entityName, Object entityId, RevisionType revisionType, Object revisionEntity) {
+        throw new NotImplementedException("Not implemented yet");
     }
 }

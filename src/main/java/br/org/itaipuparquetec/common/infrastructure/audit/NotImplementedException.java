@@ -1,4 +1,4 @@
-package br.org.itaipuparquetec.common.infrastructure.audit.repository;
+package br.org.itaipuparquetec.common.infrastructure.audit;
 
 public class NotImplementedException extends RuntimeException {
 

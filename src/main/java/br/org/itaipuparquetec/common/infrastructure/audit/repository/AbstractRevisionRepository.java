@@ -1,5 +1,6 @@
 package br.org.itaipuparquetec.common.infrastructure.audit.repository;
 
+import br.org.itaipuparquetec.common.infrastructure.audit.NotImplementedException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 

@@ -16,7 +16,7 @@ import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-public class MessageSourceHolderTest {
+class MessageSourceHolderTest {
 
     private MessageSource messageSource;
 
@@ -52,7 +52,7 @@ public class MessageSourceHolderTest {
         String code = "test.code.args";
         Object[] args = new Object[]{"a", 1};
         String expected = "Message with args";
-        when(messageSource.getMessage(eq(code), eq(args), eq(locale))).thenReturn(expected);
+        when(messageSource.getMessage(code, args, locale)).thenReturn(expected);
 
         String result = MessageSourceHolder.getMessage(locale, code, args);
 
@@ -84,7 +84,7 @@ public class MessageSourceHolderTest {
         MessageSourceResolvable resolvable = mock(MessageSourceResolvable.class);
         Locale locale = Locale.ENGLISH;
         String expected = "Resolvable Message";
-        when(messageSource.getMessage(eq(resolvable), eq(locale))).thenReturn(expected);
+        when(messageSource.getMessage(resolvable, locale)).thenReturn(expected);
 
         String result = MessageSourceHolder.getMessage(resolvable, locale);
 
