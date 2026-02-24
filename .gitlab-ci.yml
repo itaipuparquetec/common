@@ -59,6 +59,28 @@ deploy:
   needs:
     - job: quality-gate
       artifacts: true
+  before_script:
+    - mkdir -p ~/.m2
+    - |
+      cat <<EOF > ~/.m2/settings.xml
+      <settings xmlns="https://maven.apache.org/SETTINGS/1.0.0"
+                xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                xsi:schemaLocation="https://maven.apache.org/SETTINGS/1.0.0
+                                    https://maven.apache.org/xsd/settings-1.0.0.xsd">
+        <servers>
+          <server>
+            <id>maven-snapshots</id>
+            <username>${MAVEN_REPO_USER}</username>
+            <password>${MAVEN_REPO_PASSWORD}</password>
+          </server>
+          <server>
+            <id>maven-releases</id>
+            <username>${MAVEN_REPO_USER}</username>
+            <password>${MAVEN_REPO_PASSWORD}</password>
+          </server>
+        </servers>
+      </settings>
+      EOF
   script:
     - mvn deploy -DskipTests
   rules:
