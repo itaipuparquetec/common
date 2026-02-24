@@ -13,16 +13,12 @@ import java.io.Serial;
 import java.io.Serializable;
 
 
-/**
- * @param <T>
- * @param <ID>
- */
 @Data
 @jakarta.persistence.Entity
 @lombok.EqualsAndHashCode
 @Table(name = Revision.TABLE_NAME)
-@RevisionEntity(EntityTrackingRevisionListener.class)
-public class Revision<T extends Entity<ID>, ID extends Serializable> implements Serializable {
+@RevisionEntity(TrackingEntityRevisionListener.class)
+public class Revision implements Serializable {
 
     /**
      *

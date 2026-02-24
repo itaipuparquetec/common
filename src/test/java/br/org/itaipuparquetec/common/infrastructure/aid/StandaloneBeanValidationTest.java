@@ -9,7 +9,7 @@ import java.util.UUID;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-public class StandaloneBeanValidationTest {
+class StandaloneBeanValidationTest {
 
     @Test
     void cannotThrowAnyExceptionIfTheModelDoesntHaveInvalidations() {

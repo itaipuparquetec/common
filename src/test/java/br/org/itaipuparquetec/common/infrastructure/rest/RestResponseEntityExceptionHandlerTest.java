@@ -18,8 +18,9 @@ import java.util.stream.Stream;
 
 import static org.mockito.Mockito.*;
 
-public class RestResponseEntityExceptionHandlerTest {
+class RestResponseEntityExceptionHandlerTest {
 
+    private static final Locale DEFAULT_LOCALE = Locale.of("pt", "BR");
     private final MessageSource messageSource = mock(MessageSource.class);
     private final LocaleService localeService = mock(LocaleService.class);
 
@@ -28,7 +29,6 @@ public class RestResponseEntityExceptionHandlerTest {
 
     @Test
     void mustHandleAlreadyExistsFieldsException() {
-        final Locale DEFAULT_LOCALE = Locale.of("pt", "BR");
         final String errorMessageExpected = "Os campos campo1, campo2 e campo3 já existem.";
         final String keyCodeOfMessageExpected = "repository.fieldsAlreadyExists";
         final String[] splitFieldsExpected = new String[]{"field1", "field2", "field3"};
@@ -76,7 +76,6 @@ public class RestResponseEntityExceptionHandlerTest {
         final String attribute = "field1";
         final String keyCodeOfMessageExpected = "repository.fieldCannotBeEmpty";
         final var exception = new EmptyFieldException(attribute);
-        final Locale DEFAULT_LOCALE = Locale.of("pt", "BR");
         when(localeService.getLocale()).thenReturn(DEFAULT_LOCALE);
         when(messageSource.getMessage(eq(attribute), any(String[].class), eq(DEFAULT_LOCALE))).thenReturn("campo1");
         final String errorMessageExpected = "Error expected.";
@@ -97,7 +96,6 @@ public class RestResponseEntityExceptionHandlerTest {
         final String attribute = "field1";
         final String keyCodeOfMessageExpected = "repository.fieldAlreadyExists";
         final var exception = new AlreadyExistsFieldException(attribute);
-        final Locale DEFAULT_LOCALE = Locale.of("pt", "BR");
         when(localeService.getLocale()).thenReturn(DEFAULT_LOCALE);
         when(messageSource.getMessage(eq(attribute), any(String[].class), eq(DEFAULT_LOCALE))).thenReturn("campo1");
         final String errorMessageExpected = "Error expected.";
@@ -118,7 +116,6 @@ public class RestResponseEntityExceptionHandlerTest {
         final String attribute = "field1";
         final String keyCodeOfMessageExpected = "repository.fieldCannotBeNull";
         final var exception = new NullFieldException(attribute);
-        final Locale DEFAULT_LOCALE = Locale.of("pt", "BR");
         when(localeService.getLocale()).thenReturn(DEFAULT_LOCALE);
         when(messageSource.getMessage(eq(attribute), any(String[].class), eq(DEFAULT_LOCALE))).thenReturn("campo1");
         final String errorMessageExpected = "Error expected.";
@@ -139,7 +136,6 @@ public class RestResponseEntityExceptionHandlerTest {
         final String attribute = "field1";
         final String keyCodeOfMessageExpected = "repository.fieldCannotBeLessThanZero";
         final var exception = new LessThanZeroFieldException(attribute);
-        final Locale DEFAULT_LOCALE = Locale.of("pt", "BR");
         when(localeService.getLocale()).thenReturn(DEFAULT_LOCALE);
         when(messageSource.getMessage(eq(attribute), any(String[].class), eq(DEFAULT_LOCALE))).thenReturn("campo1");
         final String errorMessageExpected = "Error expected.";
@@ -160,7 +156,6 @@ public class RestResponseEntityExceptionHandlerTest {
         final String attribute = "field1";
         final String keyCodeOfMessageExpected = "repository.fieldCannotBeGreaterThan";
         final var exception = new TooLargeFieldException(attribute, 100);
-        final Locale DEFAULT_LOCALE = Locale.of("pt", "BR");
         when(localeService.getLocale()).thenReturn(DEFAULT_LOCALE);
         when(messageSource.getMessage(eq(attribute + ",100"), any(String[].class), eq(DEFAULT_LOCALE)))
                 .thenReturn("campo1", "100");
@@ -182,7 +177,6 @@ public class RestResponseEntityExceptionHandlerTest {
         final String attribute = "field1";
         final String keyCodeOfMessageExpected = "repository.fieldCannotBeLessThan";
         final var exception = new TooShortFieldException(attribute, 100);
-        final Locale DEFAULT_LOCALE = Locale.of("pt", "BR");
         when(localeService.getLocale()).thenReturn(DEFAULT_LOCALE);
         when(messageSource.getMessage(eq(attribute + ",100"), any(String[].class), eq(DEFAULT_LOCALE)))
                 .thenReturn("campo1", "100");
@@ -204,7 +198,6 @@ public class RestResponseEntityExceptionHandlerTest {
         final String attribute = "field1";
         final String keyCodeOfMessageExpected = "repository.fieldIsInvalid";
         final var exception = new InvalidFieldException(attribute);
-        final Locale DEFAULT_LOCALE = Locale.of("pt", "BR");
         when(localeService.getLocale()).thenReturn(DEFAULT_LOCALE);
         when(messageSource.getMessage(eq(attribute), any(String[].class), eq(DEFAULT_LOCALE))).thenReturn("campo1");
         final String errorMessageExpected = "Error expected.";
@@ -225,7 +218,6 @@ public class RestResponseEntityExceptionHandlerTest {
         final String attribute = "field1";
         final String keyCodeOfMessageExpected = "repository.notFoundRegister";
         final var exception = new NotFoundRegisterException(attribute);
-        final Locale DEFAULT_LOCALE = Locale.of("pt", "BR");
         when(localeService.getLocale()).thenReturn(DEFAULT_LOCALE);
         when(messageSource.getMessage(eq(attribute), any(String[].class), eq(DEFAULT_LOCALE))).thenReturn("campo1");
         final String errorMessageExpected = "Error expected.";
@@ -246,7 +238,6 @@ public class RestResponseEntityExceptionHandlerTest {
         final String attribute = "field1";
         final String keyCodeOfMessageExpected = "security.accessDeniedToResource";
         final var exception = new ForbiddenException(attribute);
-        final Locale DEFAULT_LOCALE = Locale.of("pt", "BR");
         when(localeService.getLocale()).thenReturn(DEFAULT_LOCALE);
         when(messageSource.getMessage(eq(attribute), any(String[].class), eq(DEFAULT_LOCALE))).thenReturn("campo1");
         final String errorMessageExpected = "Error expected.";
@@ -266,7 +257,6 @@ public class RestResponseEntityExceptionHandlerTest {
     void mustHandleAccessDeniedException() {
         final String keyCodeOfMessageExpected = "security.accessDenied";
         final var exception = new org.springframework.security.access.AccessDeniedException("Access is denied");
-        final Locale DEFAULT_LOCALE = Locale.of("pt", "BR");
         when(localeService.getLocale()).thenReturn(DEFAULT_LOCALE);
         final String errorMessageExpected = "Error expected.";
         when(messageSource.getMessage(keyCodeOfMessageExpected, new String[]{}, DEFAULT_LOCALE))
@@ -284,7 +274,6 @@ public class RestResponseEntityExceptionHandlerTest {
     void mustHandleGenericException() {
         final String keyCodeOfMessageExpected = "repository.genericException";
         final var exception = new Exception("Generic Exception");
-        final Locale DEFAULT_LOCALE = Locale.of("pt", "BR");
         when(localeService.getLocale()).thenReturn(DEFAULT_LOCALE);
         final String errorMessageExpected = "Error expected.";
         when(messageSource.getMessage(keyCodeOfMessageExpected, new String[]{}, DEFAULT_LOCALE))

@@ -4,12 +4,12 @@ import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
-public class AbstractRevisionRepositoryTest {
+class AbstractRevisionRepositoryTest {
 
     @Test
     void mustGetTypeOfRepository() {
 
-        final var productRevisionRepository = new ProductRevisionRepository(null);
+        final var productRevisionRepository = new ProductRevisionRepository();
 
         assertThat(productRevisionRepository.clazz).isEqualTo(Produtct.class);
     }

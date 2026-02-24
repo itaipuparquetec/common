@@ -29,7 +29,7 @@ public abstract class AbstractJPAEntity implements Entity<UUID> {
     /**
      *
      */
-    public AbstractJPAEntity() {
+    protected AbstractJPAEntity() {
     }
 
 }

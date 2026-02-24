@@ -21,7 +21,7 @@ import static br.org.itaipuparquetec.common.domain.exceptions.TooShortFieldExcep
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatCode;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 
-public class ExceptionBuilderTest {
+class ExceptionBuilderTest {
 
     @Test
     void mustThrowAnExceptionWhenTheInputIsNull() {
@@ -423,14 +423,6 @@ public class ExceptionBuilderTest {
         return Stream.of(
                 Arguments.of("aaaaaaaaa", 10),
                 Arguments.of("aa", 3)
-        );
-    }
-
-    private static Stream<Arguments> provideStringToDontThrowExceptionWhenStringIsLessThan() {
-        return Stream.of(
-                Arguments.of("aaaaaaaaaa", 10),
-                Arguments.of("a", 1),
-                Arguments.of("", 0)
         );
     }
 }
