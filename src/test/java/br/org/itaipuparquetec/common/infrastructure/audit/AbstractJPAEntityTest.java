@@ -3,7 +3,7 @@ package br.org.itaipuparquetec.common.infrastructure.audit;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-public class AbstractJPAEntityTest {
+class AbstractJPAEntityTest {
 
     @Test
     void mustCreateInstanceOfAbstractJPAEntity() {

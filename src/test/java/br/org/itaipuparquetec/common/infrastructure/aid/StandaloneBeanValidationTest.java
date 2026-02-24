@@ -6,10 +6,18 @@ import org.junit.jupiter.api.Test;
 
 import java.util.UUID;
 
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class StandaloneBeanValidationTest {
+
+    @Test
+    void cannotInstantiateStandaloneBeanValidationByDefaultConstructor() {
+        final var exception = assertThrows(IllegalStateException.class, StandaloneBeanValidation::new);
+
+        assertThat(exception.getMessage()).isEqualTo("Utility class");
+    }
 
     @Test
     void cannotThrowAnyExceptionIfTheModelDoesntHaveInvalidations() {

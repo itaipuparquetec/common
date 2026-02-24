@@ -1,6 +1,5 @@
 package br.org.itaipuparquetec.common.infrastructure.rest;
 
-import br.org.itaipuparquetec.common.domain.exceptions.ExceptionBuilder;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import org.springframework.data.domain.Page;
@@ -8,11 +7,6 @@ import org.springframework.data.domain.Page;
 import java.util.List;
 
 public record PageResponse<T>(@JsonProperty @JsonIgnore Page<T> page) {
-
-    public PageResponse(Page<T> page) {
-        new ExceptionBuilder().whenNull(page, "page").thenThrows();
-        this.page = page;
-    }
 
     @JsonProperty
     public List<T> getContent() {

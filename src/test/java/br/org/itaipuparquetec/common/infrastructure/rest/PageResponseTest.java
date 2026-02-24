@@ -1,6 +1,5 @@
 package br.org.itaipuparquetec.common.infrastructure.rest;
 
-import br.org.itaipuparquetec.common.domain.exceptions.NullFieldException;
 import org.junit.jupiter.api.Test;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -8,16 +7,8 @@ import org.springframework.data.domain.PageRequest;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 class PageResponseTest {
-
-    @Test
-    void shouldThrowExceptionWhenPageIsNull() {
-        assertThatThrownBy(() -> new PageResponse<>(null))
-                .isInstanceOf(NullFieldException.class)
-                .hasMessage("The field \"page\" cannot be null.");
-    }
 
     @Test
     void shouldReturnPageContent() {
@@ -123,7 +114,6 @@ class PageResponseTest {
         final var response = new PageResponse<>(new PageImpl<>(List.of("A")));
         final var otherResponse = new PageResponse<>(new PageImpl<>(List.of("B")));
 
-        assertThat(response).isNotNull();
         assertThat(response).isNotEqualTo(otherResponse);
     }
 }
