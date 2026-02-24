@@ -121,8 +121,9 @@ class PageResponseTest {
     @Test
     void equalsShouldReturnFalseForDifferentObjects() {
         final var response = new PageResponse<>(new PageImpl<>(List.of("A")));
+        final var otherResponse = new PageResponse<>(new PageImpl<>(List.of("B")));
 
-        assertThat(response).isNotEqualTo(null);
-        assertThat(response).isNotEqualTo("not-a-page-response");
+        assertThat(response).isNotNull();
+        assertThat(response).isNotEqualTo(otherResponse);
     }
 }

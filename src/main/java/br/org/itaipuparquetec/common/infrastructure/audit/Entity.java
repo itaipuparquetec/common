@@ -5,18 +5,18 @@ import java.io.Serializable;
 /**
  * @version 1.0
  */
-public interface Entity<ID extends Serializable> extends Serializable {
+public interface Entity<I extends Serializable> extends Serializable {
     /*-------------------------------------------------------------------
      * 		 				GETTERS AND SETTERS
      *-------------------------------------------------------------------*/
 
     /**
-     * @return ID
+     * @return I
      */
-    ID getId();
+    I getId();
 
     /**
-     * @param id ID
+     * @param id I
      */
-    void setId(ID id);
+    void setId(I id);
 }

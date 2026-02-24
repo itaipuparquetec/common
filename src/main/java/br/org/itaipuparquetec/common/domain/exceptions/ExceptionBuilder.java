@@ -8,9 +8,6 @@ public class ExceptionBuilder {
 
     private final List<RuntimeException> exceptions = new ArrayList<>();
 
-    public ExceptionBuilder() {
-    }
-
     public ExceptionBuilder whenNull(Object value, String field) {
         if (value == null)
             this.exceptions.add(new NullFieldException(field));
@@ -45,13 +42,13 @@ public class ExceptionBuilder {
         return this;
     }
 
-    public ExceptionBuilder whenStringSizeGreaterThan(String value, int maxSize, String field){
+    public ExceptionBuilder whenStringSizeGreaterThan(String value, int maxSize, String field) {
         if (value != null && value.length() > maxSize)
             this.exceptions.add(new TooLargeFieldException(field, maxSize));
         return this;
     }
 
-    public ExceptionBuilder whenStringSizeLessThan(String value, int maxSize, String field){
+    public ExceptionBuilder whenStringSizeLessThan(String value, int maxSize, String field) {
         if (value != null && value.length() < maxSize)
             this.exceptions.add(new TooShortFieldException(field, maxSize));
         return this;
@@ -86,7 +83,7 @@ public class ExceptionBuilder {
             this.exceptions.add(new ForbiddenException(field));
         return this;
     }
-    
+
     public ExceptionBuilder when(boolean condition, String field) {
         if (condition)
             this.exceptions.add(new InvalidFieldException(field));
