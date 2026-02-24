@@ -5,11 +5,11 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>br.org.itaipuparquetec</groupId>
-    <artifactId>common</artifactId>
-    <version>2.5.0</version>
+    <artifactId>java-common</artifactId>
+    <version>2.5.1</version>
     <packaging>jar</packaging>
 
-    <name>Common</name>
+    <name>java-common</name>
     <description>Itaipu Parquetec - Fábrica de Software Java Common</description>
     <url>https://git.itaipuparquetec.org.br/fabrica-de-software/common</url>
 
