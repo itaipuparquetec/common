@@ -1,6 +1,5 @@
 package br.org.itaipuparquetec.common.infrastructure.audit.repository;
 
-import jakarta.annotation.PostConstruct;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -14,18 +13,10 @@ import java.util.UUID;
  */
 public abstract class AbstractRevisionRepository<T> implements RevisionRepository<T> {
 
-
     /**
      *
      */
     final Class<T> clazz = resolveGenericType();
-
-    /**
-     *
-     */
-    @PostConstruct
-    public void postConstruct() {
-    }
 
     /**
      * @param id Long
