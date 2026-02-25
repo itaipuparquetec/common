@@ -19,6 +19,7 @@ tests:
     - common
   script:
     - mvn clean verify
+    - mvn javadoc:javadoc
     - cat target/site/jacoco/index.html | grep -o 'Total[^%]*%' | sed 's/Total/Total Coverage:/'
   coverage: '/\d+\%/'
   artifacts:
@@ -27,6 +28,7 @@ tests:
     paths:
       - target/
       - target/*.jar
+      - target/site/javadoc/
     reports:
       junit:
         - target/surefire-reports/*.xml

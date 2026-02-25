@@ -32,7 +32,6 @@ public class CustomNamingStrategy extends ImplicitNamingStrategyJpaCompliantImpl
      * @param source
      * @return
      * @implNote this is not working due to this bug in Hibernate implementation
-     * @see <a href="https://hibernate.atlassian.net/browse/HHH-11586">HHH-11586</>
      */
     @Override
     public Identifier determineUniqueKeyName(ImplicitUniqueKeyNameSource source) {
