@@ -1,16 +1,19 @@
 package br.org.itaipuparquetec.common.infrastructure.hibernate.function;
 
-import org.hibernate.boot.MetadataBuilder;
-import org.hibernate.boot.spi.MetadataBuilderContributor;
+import org.hibernate.boot.model.FunctionContributions;
+import org.hibernate.boot.model.FunctionContributor;
 import org.hibernate.type.spi.TypeConfiguration;
 
 
-public class SqlFunctionsMetadataBuilderContributor implements MetadataBuilderContributor {
+public class SqlFunctionsMetadataBuilderContributor implements FunctionContributor {
+
     @Override
-    public void contribute(MetadataBuilder metadataBuilder) {
-        metadataBuilder.applySqlFunction(
+    public void contributeFunctions(FunctionContributions functionContributions) {
+        TypeConfiguration typeConfiguration = functionContributions.getTypeConfiguration();
+
+        functionContributions.getFunctionRegistry().register(
                 "FILTER",
-                new FilterSqmFunctionDescriptor(new TypeConfiguration())
+                new FilterSqmFunctionDescriptor(typeConfiguration)
         );
     }
 }

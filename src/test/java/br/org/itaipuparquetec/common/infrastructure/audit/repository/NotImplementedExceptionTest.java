@@ -1,10 +1,11 @@
 package br.org.itaipuparquetec.common.infrastructure.audit.repository;
 
+import br.org.itaipuparquetec.common.infrastructure.audit.NotImplementedException;
 import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
-public class NotImplementedExceptionTest {
+class NotImplementedExceptionTest {
 
     @Test
     void mustCreateInstanceOfNotImplementedException() {

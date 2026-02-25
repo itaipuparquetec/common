@@ -11,6 +11,10 @@ import java.util.Set;
  */
 public final class StandaloneBeanValidation {
 
+    StandaloneBeanValidation() {
+        throw new IllegalStateException("Utility class");
+    }
+
     /**
      * Valida o bean em relação as suas anotações (faz isso sem precisar ir até o banco e abrir transação)
      *

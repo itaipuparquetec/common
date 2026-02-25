@@ -2,7 +2,11 @@ package br.org.itaipuparquetec.common.infrastructure.formatters;
 
 import java.util.StringJoiner;
 
-public class FieldFormatter {
+public final class FieldFormatter {
+
+    FieldFormatter() {
+        throw new IllegalStateException("Utility class");
+    }
 
     public static String format(String conjunction, String... fields) {
         if (fields == null || fields.length == 0) {

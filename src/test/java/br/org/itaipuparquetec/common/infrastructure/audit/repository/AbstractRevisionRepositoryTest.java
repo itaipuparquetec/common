@@ -1,5 +1,6 @@
 package br.org.itaipuparquetec.common.infrastructure.audit.repository;
 
+import br.org.itaipuparquetec.common.infrastructure.audit.NotImplementedException;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 

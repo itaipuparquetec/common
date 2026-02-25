@@ -14,7 +14,11 @@ import java.util.Locale;
  * @version 1.0.0
  * @since 1.0.0, 10/09/2019
  */
-public class MessageSourceHolder {
+public final class MessageSourceHolder {
+
+    MessageSourceHolder() {
+        throw new IllegalStateException("Utility class");
+    }
 
     /**
      *

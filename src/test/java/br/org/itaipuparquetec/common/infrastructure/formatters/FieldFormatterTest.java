@@ -1,14 +1,24 @@
 package br.org.itaipuparquetec.common.infrastructure.formatters;
 
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
 import java.util.stream.Stream;
 
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class FieldFormatterTest {
+
+    @Test
+    void cannotInstantiateFieldFormatterByDefaultConstructor() {
+        final var exception = assertThrows(IllegalStateException.class, FieldFormatter::new);
+
+        assertThat(exception.getMessage()).isEqualTo("Utility class");
+    }
 
     @ParameterizedTest
     @MethodSource("provideCustomFieldsToFormatThem")
