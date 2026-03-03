@@ -6,7 +6,7 @@
 
     <groupId>br.org.itaipuparquetec</groupId>
     <artifactId>java-common</artifactId>
-    <version>2.6.11</version>
+    <version>2.7.0</version>
     <packaging>jar</packaging>
 
     <name>java-common</name>
@@ -73,6 +73,18 @@
         <sonar.java.binaries>target/classes</sonar.java.binaries>
     </properties>
 
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-dependencies</artifactId>
+                <version>3.5.11</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
     <dependencies>
         <dependency>
             <groupId>org.assertj</groupId>
@@ -91,7 +103,6 @@
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter-api</artifactId>
-            <version>${junit-jupiter-api.version}</version>
             <scope>test</scope>
         </dependency>
 
@@ -116,7 +127,6 @@
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter-params</artifactId>
-            <version>${junit-jupiter-params.version}</version>
             <scope>test</scope>
         </dependency>
 
@@ -148,11 +158,22 @@
             <artifactId>spring-boot-starter-data-jpa</artifactId>
             <version>${spring-boot-starter.version}</version>
         </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-webflux</artifactId>
+            <version>${spring-boot-starter.version}</version>
+        </dependency>
 
         <dependency>
             <groupId>org.mockito</groupId>
             <artifactId>mockito-core</artifactId>
             <version>${mockito-core.version}</version>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-junit-jupiter</artifactId>
             <scope>test</scope>
         </dependency>
     </dependencies>
