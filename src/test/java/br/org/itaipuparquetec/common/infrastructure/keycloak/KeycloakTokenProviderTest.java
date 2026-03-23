@@ -97,7 +97,6 @@ class KeycloakTokenProviderTest {
         verify(exchangeFunction, times(2)).exchange(any());
     }
 
-    // TODO ver esses testes depois
     @Test
     void shouldReturnEmptyToken() {
         final ClientResponse clientResponseMock = mock(ClientResponse.class);
@@ -105,9 +104,9 @@ class KeycloakTokenProviderTest {
         when(clientResponseMock.bodyToMono(KeycloakTokenResponse.class))
                 .thenReturn(Mono.just(new KeycloakTokenResponse(null, 3600)));
         when(exchangeFunction.exchange(any())).thenReturn(Mono.just(clientResponseMock));
+        final var monoToken = keycloakTokenProvider.getOrRefresh();
 
-        final var exception = assertThrows(HttpClientErrorException.class, () ->
-                keycloakTokenProvider.getOrRefresh().block());
+        final var exception = assertThrows(HttpClientErrorException.class, monoToken::block);
 
         assertEquals(KEYCLOAK_TOKEN_ERROR, exception.getMessage());
         verify(exchangeFunction, times(1)).exchange(any());
