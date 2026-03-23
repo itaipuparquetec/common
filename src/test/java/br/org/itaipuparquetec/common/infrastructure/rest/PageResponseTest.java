@@ -116,4 +116,32 @@ class PageResponseTest {
 
         assertThat(response).isNotEqualTo(otherResponse);
     }
+
+    @Test
+    void mustSetInformationToDeserialize() {
+        final List<String> contentExpected = List.of("A", "B");
+        final var lastExpected = true;
+        final var totalPagesExpected = 2;
+        final var sizeExpected = 2;
+        final var totalElementsExpected = 3;
+        final var hasNextExpected = true;
+        final var pageNumberExpected = 1;
+        final var response = new PageResponse<String>();
+
+        response.setContent(contentExpected);
+        response.setLast(lastExpected);
+        response.setTotalPages(totalPagesExpected);
+        response.setSize(sizeExpected);
+        response.setTotalElements(totalElementsExpected);
+        response.setHasNext(hasNextExpected);
+        response.setPageNumber(pageNumberExpected);
+
+        assertThat(response.getContent()).isEqualTo(contentExpected);
+        assertThat(response.isLast()).isEqualTo(lastExpected);
+        assertThat(response.getTotalPages()).isEqualTo(totalPagesExpected);
+        assertThat(response.getSize()).isEqualTo(sizeExpected);
+        assertThat(response.getTotalElements()).isEqualTo(totalElementsExpected);
+        assertThat(response.hasNext()).isEqualTo(hasNextExpected);
+        assertThat(response.getPageNumber()).isEqualTo(pageNumberExpected);
+    }
 }

@@ -1,35 +1,52 @@
 package br.org.itaipuparquetec.common.infrastructure.rest;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.Data;
 import org.springframework.data.domain.Page;
 
 import java.util.List;
 
-public record PageResponse<T>(@JsonProperty @JsonIgnore Page<T> page) {
+@Data
+public class PageResponse<T> {
+
+    private int size;
+    private boolean hasNext;
+    private boolean isLast;
+    private int pageNumber;
+    private int totalPages;
+    private List<T> content;
+    private long totalElements;
+
+    public PageResponse() {}
+
+    public PageResponse(Page<T> page) {
+        this.content = page.getContent();
+        this.totalPages = page.getSize() == 0 ? 1 : (int) Math.ceil((double) page.getTotalElements() / (double) page.getSize());
+        this.totalElements = page.getTotalElements();
+        this.pageNumber = page.getNumber();
+        this.size = page.getSize();
+
+        this.hasNext = this.pageNumber + 1 < this.getTotalPages();
+        this.isLast = !this.hasNext;
+    }
 
     @JsonProperty
     public List<T> getContent() {
-        return page.getContent();
+        return content;
     }
 
-    public int getTotalPages() {
-        return this.page.getSize() == 0 ? 1 : (int) Math.ceil((double) this.page.getTotalElements() / (double) this.page.getSize());
+    @JsonProperty
+    public Integer getTotalPages() {
+        return totalPages;
     }
 
+    @JsonProperty
     public long getTotalElements() {
-        return this.page.getTotalElements();
+        return totalElements;
     }
 
     public boolean hasNext() {
-        return this.page.getNumber() + 1 < this.getTotalPages();
+        return this.hasNext;
     }
 
-    public boolean isLast() {
-        return !this.hasNext();
-    }
-
-    public long getSize() {
-        return this.page.getSize();
-    }
 }

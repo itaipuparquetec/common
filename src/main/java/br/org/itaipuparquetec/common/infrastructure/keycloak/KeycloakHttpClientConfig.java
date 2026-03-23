@@ -1,28 +1,32 @@
 package br.org.itaipuparquetec.common.infrastructure.keycloak;
 
 import io.netty.channel.ChannelOption;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.MediaType;
 import org.springframework.http.client.reactive.ReactorClientHttpConnector;
-import org.springframework.web.reactive.function.client.*;
+import org.springframework.web.reactive.function.client.ClientRequest;
+import org.springframework.web.reactive.function.client.ExchangeFilterFunction;
+import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.support.WebClientAdapter;
 import org.springframework.web.service.invoker.HttpServiceProxyFactory;
 import reactor.core.publisher.Mono;
 import reactor.netty.http.client.HttpClient;
+
+import java.time.Duration;
+import java.util.Objects;
 
 @Configuration
 @EnableConfigurationProperties({KeycloakProperties.class, KeycloakHttpProperties.class})
 public class KeycloakHttpClientConfig {
 
     @Bean
-    WebClient keycloakRawWebClient(
-            final KeycloakProperties props,
-            final KeycloakHttpProperties http
-    ) {
+    @Qualifier("keycloakRawWebClient")
+    WebClient keycloakRawWebClient(final KeycloakProperties props, final KeycloakHttpProperties http) {
         final HttpClient httpClient = HttpClient.create()
-                .responseTimeout(java.time.Duration.ofMillis(http.readTimeoutMs()))
+                .responseTimeout(Duration.ofMillis(http.readTimeoutMs()))
                 .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, http.connectTimeoutMs());
 
         return WebClient.builder()
@@ -33,8 +37,9 @@ public class KeycloakHttpClientConfig {
     }
 
     @Bean
+    @Qualifier("keycloakHttpServiceProxyFactory")
     public HttpServiceProxyFactory keycloakHttpServiceProxyFactory(
-            final WebClient keycloakWebClient,
+            @Qualifier("keycloakRawWebClient") final WebClient keycloakWebClient,
             final KeycloakTokenProvider tokenProvider
     ) {
         final ExchangeFilterFunction authFilter = (request, next) -> {
@@ -59,7 +64,7 @@ public class KeycloakHttpClientConfig {
 
     private ClientRequest createRequest(final ClientRequest request, final KeycloakTokenProvider tokenProvider) {
         return ClientRequest.from(request)
-                .headers(h -> h.setBearerAuth(tokenProvider.getOrRefresh()))
+                .headers(h -> h.setBearerAuth((Objects.requireNonNull(tokenProvider.getOrRefresh().block()))))
                 .build();
     }
 }
