@@ -23,7 +23,6 @@ import java.util.Objects;
 public class KeycloakHttpClientConfig {
 
     @Bean
-    @Qualifier("keycloakRawWebClient")
     WebClient keycloakRawWebClient(final KeycloakProperties props, final KeycloakHttpProperties http) {
         final HttpClient httpClient = HttpClient.create()
                 .responseTimeout(Duration.ofMillis(http.readTimeoutMs()))
@@ -37,7 +36,6 @@ public class KeycloakHttpClientConfig {
     }
 
     @Bean
-    @Qualifier("keycloakHttpServiceProxyFactory")
     public HttpServiceProxyFactory keycloakHttpServiceProxyFactory(
             @Qualifier("keycloakRawWebClient") final WebClient keycloakWebClient,
             final KeycloakTokenProvider tokenProvider

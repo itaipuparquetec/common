@@ -1,8 +1,10 @@
 package br.org.itaipuparquetec.common.infrastructure.keycloak;
 
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
@@ -50,7 +52,7 @@ public class KeycloakTokenProvider {
                 .bodyToMono(KeycloakTokenResponse.class)
                 .handle((tokenResponse, sink) -> {
                     if (tokenResponse == null || tokenResponse.access_token() == null) {
-                        sink.error(new RuntimeException("Error getting token"));
+                        sink.error(new HttpClientErrorException(HttpStatus.BAD_REQUEST, "Error getting token from keycloak"));
                         return;
                     }
 
