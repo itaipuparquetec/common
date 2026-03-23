@@ -39,8 +39,8 @@ class KeycloakHttpClientConfigTest {
         final var firstToken = UUID.randomUUID().toString();
         final var secondToken = UUID.randomUUID().toString();
         when(keycloakTokenProvider.getOrRefresh())
-                .thenReturn(firstToken)
-                .thenReturn(secondToken);
+                .thenReturn(Mono.just(firstToken))
+                .thenReturn(Mono.just(secondToken));
         when(exchangeFunction.exchange(any()))
                 .thenReturn(Mono.just(ClientResponse.create(HttpStatus.UNAUTHORIZED).build()))
                 .thenReturn(Mono.just(ClientResponse.create(HttpStatus.UNAUTHORIZED).build()));
@@ -63,8 +63,8 @@ class KeycloakHttpClientConfigTest {
         final var firstToken = UUID.randomUUID().toString();
         final var secondToken = UUID.randomUUID().toString();
         when(keycloakTokenProvider.getOrRefresh())
-                .thenReturn(firstToken)
-                .thenReturn(secondToken);
+                .thenReturn(Mono.just(firstToken))
+                .thenReturn(Mono.just(secondToken));
         when(exchangeFunction.exchange(any()))
                 .thenReturn(Mono.just(ClientResponse.create(HttpStatus.FORBIDDEN).build()))
                 .thenReturn(Mono.just(ClientResponse.create(HttpStatus.FORBIDDEN).build()));
@@ -86,7 +86,7 @@ class KeycloakHttpClientConfigTest {
     void shouldNotRetryOnBadRequest() {
         final var firstToken = UUID.randomUUID().toString();
         when(keycloakTokenProvider.getOrRefresh())
-                .thenReturn(firstToken);
+                .thenReturn(Mono.just(firstToken));
         when(exchangeFunction.exchange(any()))
                 .thenReturn(Mono.just(ClientResponse.create(HttpStatus.BAD_REQUEST).build()));
         final var keycloakAdminApi = httpServiceProxyFactory.createClient(KeycloakAdminApi.class);

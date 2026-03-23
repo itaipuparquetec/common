@@ -1,12 +1,14 @@
 package br.org.itaipuparquetec.common.infrastructure.keycloak;
 
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.http.*;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.client.HttpClientErrorException;
-import org.springframework.web.reactive.function.client.*;
-
+import org.springframework.web.reactive.function.client.ClientResponse;
+import org.springframework.web.reactive.function.client.ExchangeFunction;
+import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 
 import java.util.UUID;
@@ -47,8 +49,8 @@ class KeycloakTokenProviderTest {
         when(exchangeFunction.exchange(any())).thenReturn(Mono.just(clientResponseMock));
 
 
-        final String firstToken = keycloakTokenProvider.getOrRefresh();
-        final String secondToken = keycloakTokenProvider.getOrRefresh();
+        final String firstToken = keycloakTokenProvider.getOrRefresh().block();
+        final String secondToken = keycloakTokenProvider.getOrRefresh().block();
 
         assertEquals(token, firstToken);
         assertEquals(token, secondToken);
@@ -67,8 +69,8 @@ class KeycloakTokenProviderTest {
         when(exchangeFunction.exchange(any())).thenReturn(Mono.just(clientResponseMock));
         when(keycloakProperties.tokenSafetyMarginSeconds()).thenReturn(30);
 
-        final String firstTokenGet = keycloakTokenProvider.getOrRefresh();
-        final String secondTokenGet = keycloakTokenProvider.getOrRefresh();
+        final String firstTokenGet = keycloakTokenProvider.getOrRefresh().block();
+        final String secondTokenGet = keycloakTokenProvider.getOrRefresh().block();
 
         assertEquals(firstTokenGet, firstToken);
         assertEquals(secondTokenGet, secondToken);
@@ -86,9 +88,9 @@ class KeycloakTokenProviderTest {
                 .thenReturn(Mono.just(new KeycloakTokenResponse(secondToken, 3600)));
         when(exchangeFunction.exchange(any())).thenReturn(Mono.just(clientResponseMock));
 
-        final String firstTokenGet = keycloakTokenProvider.getOrRefresh();
+        final String firstTokenGet = keycloakTokenProvider.getOrRefresh().block();
         keycloakTokenProvider.invalidate();
-        final String secondTokenGet = keycloakTokenProvider.getOrRefresh();
+        final String secondTokenGet = keycloakTokenProvider.getOrRefresh().block();
 
         assertEquals(firstTokenGet, firstToken);
         assertEquals(secondTokenGet, secondToken);
@@ -102,10 +104,11 @@ class KeycloakTokenProviderTest {
         when(clientResponseMock.bodyToMono(KeycloakTokenResponse.class))
                 .thenReturn(Mono.just(new KeycloakTokenResponse(null, 3600)));
         when(exchangeFunction.exchange(any())).thenReturn(Mono.just(clientResponseMock));
+        final var monoToken = keycloakTokenProvider.getOrRefresh();
 
-        final HttpClientErrorException ex = assertThrows(HttpClientErrorException.class, keycloakTokenProvider::getOrRefresh);
+        final var exception = assertThrows(HttpClientErrorException.class, monoToken::block);
 
-        assertEquals(KEYCLOAK_TOKEN_ERROR, ex.getMessage());
+        assertEquals(KEYCLOAK_TOKEN_ERROR, exception.getMessage());
         verify(exchangeFunction, times(1)).exchange(any());
     }
 
@@ -113,13 +116,11 @@ class KeycloakTokenProviderTest {
     void shouldReturnEmptyResponse() {
         final ClientResponse clientResponseMock = mock(ClientResponse.class);
         when(clientResponseMock.statusCode()).thenReturn(HttpStatus.OK);
-        when(clientResponseMock.bodyToMono(KeycloakTokenResponse.class))
-                .thenReturn(Mono.empty());
+        when(clientResponseMock.bodyToMono(KeycloakTokenResponse.class)).thenReturn(Mono.empty());
         when(exchangeFunction.exchange(any())).thenReturn(Mono.just(clientResponseMock));
 
-        final HttpClientErrorException ex = assertThrows(HttpClientErrorException.class, keycloakTokenProvider::getOrRefresh);
+        final var token = keycloakTokenProvider.getOrRefresh().block();
 
-        assertEquals(KEYCLOAK_TOKEN_ERROR, ex.getMessage());
-        verify(exchangeFunction, times(1)).exchange(any());
+        assertNull(token);
     }
 }
