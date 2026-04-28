@@ -1,4 +1,4 @@
-package br.org.itaipuparquetec.common.infrastructure.rest;
+package br.org.itaipuparquetec.common.domain.pagination;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
