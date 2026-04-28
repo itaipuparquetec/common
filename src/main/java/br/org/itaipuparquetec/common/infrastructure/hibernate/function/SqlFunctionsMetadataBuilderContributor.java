@@ -15,5 +15,10 @@ public class SqlFunctionsMetadataBuilderContributor implements FunctionContribut
                 "FILTER",
                 new FilterSqmFunctionDescriptor(typeConfiguration)
         );
+
+        functionContributions.getFunctionRegistry().register(
+                "FILTERLIST",
+                new FilterListSqmFunctionDescriptor(typeConfiguration)
+        );
     }
 }
