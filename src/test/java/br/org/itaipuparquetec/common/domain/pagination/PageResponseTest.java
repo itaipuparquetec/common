@@ -1,4 +1,4 @@
-package br.org.itaipuparquetec.common.infrastructure.rest;
+package br.org.itaipuparquetec.common.domain.pagination;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.data.domain.PageImpl;
