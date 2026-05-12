@@ -1,5 +1,6 @@
 package br.org.itaipuparquetec.common.infrastructure.audit.repository;
 
+import br.org.itaipuparquetec.common.infrastructure.audit.NotImplementedException;
 import br.org.itaipuparquetec.common.infrastructure.audit.Revision;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
@@ -58,25 +59,7 @@ public abstract class AbstractRevisionRepository<T> implements RevisionRepositor
 
     @Override
     public Page<RevisionDTO<T>> findRevisions(final Pageable pageable) {
-        final AuditReader auditReader = getAuditReader();
-
-        final Long total = (Long) auditReader.createQuery()
-                .forRevisionsOfEntity(clazz, false, true)
-                .addProjection(AuditEntity.revisionNumber().count())
-                .getSingleResult();
-
-        @SuppressWarnings("unchecked")
-        final List<Object[]> rawResults = auditReader.createQuery()
-                .forRevisionsOfEntityWithChanges(clazz, false)
-                .setFirstResult((int) pageable.getOffset())
-                .setMaxResults(pageable.getPageSize())
-                .getResultList();
-
-        final List<RevisionDTO<T>> content = rawResults.stream()
-                .map(this::toRevisionDTO)
-                .toList();
-
-        return new PageImpl<>(content, pageable, total);
+        throw new NotImplementedException("You're probably the first to need it, so implement it for us...");
     }
 
     protected AuditReader getAuditReader() {

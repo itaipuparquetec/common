@@ -1,6 +1,8 @@
 package br.org.itaipuparquetec.common.infrastructure.audit.repository;
 
+import br.org.itaipuparquetec.common.infrastructure.audit.NotImplementedException;
 import br.org.itaipuparquetec.common.infrastructure.audit.Revision;
+import org.assertj.core.api.Assertions;
 import org.hibernate.envers.AuditReader;
 import org.hibernate.envers.RevisionType;
 import org.hibernate.envers.query.AuditQuery;
@@ -12,6 +14,7 @@ import org.springframework.data.domain.PageRequest;
 import java.util.*;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
@@ -101,6 +104,15 @@ class AbstractRevisionRepositoryTest {
 
         assertThat(result.getContent()).isEmpty();
         assertThat(result.getTotalElements()).isZero();
+    }
+
+    @Test
+    void mustThrowAnExceptionWhenFindRevisions() {
+        final var productRevisionRepository = new ItemRevisionRepository();
+        final var exception = assertThrows(NotImplementedException.class,
+                () -> productRevisionRepository.findRevisions(null));
+        Assertions.assertThat(exception.getMessage())
+                .contains("You're probably the first to need it, so implement it for us...");
     }
 
     private Revision mockRevision(Long id, long timestamp, String user) {
