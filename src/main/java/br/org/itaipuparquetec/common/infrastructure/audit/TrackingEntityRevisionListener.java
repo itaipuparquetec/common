@@ -2,16 +2,25 @@ package br.org.itaipuparquetec.common.infrastructure.audit;
 
 import org.hibernate.envers.EntityTrackingRevisionListener;
 import org.hibernate.envers.RevisionType;
+import org.springframework.security.core.context.SecurityContextHolder;
 
 public class TrackingEntityRevisionListener implements EntityTrackingRevisionListener {
 
     @Override
     public void newRevision(final Object revisionEntity) {
-        throw new NotImplementedException("Not implemented yet");
+        ((Revision) revisionEntity).setExternalUserId(getExternalUserId());
     }
 
     @Override
     public void entityChanged(Class entityClass, String entityName, Object entityId, RevisionType revisionType, Object revisionEntity) {
-        throw new NotImplementedException("Not implemented yet");
+        ((Revision) revisionEntity).setExternalUserId(getExternalUserId());
+    }
+
+    private String getExternalUserId() {
+        if (SecurityContextHolder.getContext() != null
+                && SecurityContextHolder.getContext().getAuthentication() != null) {
+            return SecurityContextHolder.getContext().getAuthentication().getName();
+        }
+        return null;
     }
 }

@@ -1,28 +1,66 @@
 package br.org.itaipuparquetec.common.infrastructure.audit;
 
+import org.hibernate.envers.RevisionType;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.context.SecurityContextImpl;
+
+import java.util.List;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class TrackingEntityRevisionListenerTest {
 
-    @Test
-    void mustThrowNotImplementedExceptionWhenTryToCreateANewRevision() {
-        final var listener = new TrackingEntityRevisionListener();
-
-        final var exception = assertThrows(NotImplementedException.class, () -> listener.newRevision(null));
-
-        assertThat(exception.getMessage()).isEqualTo("Not implemented yet");
+    @AfterEach
+    void clearSecurityContext() {
+        SecurityContextHolder.clearContext();
     }
 
     @Test
-    void mustThrowNotImplementedExceptionWhenTryToChangeEntity() {
+    void mustSetUsernameFromSecurityContextOnNewRevision() {
+        final var auth = new UsernamePasswordAuthenticationToken("john", null, List.of());
+        SecurityContextHolder.setContext(new SecurityContextImpl(auth));
+
         final var listener = new TrackingEntityRevisionListener();
+        final var revision = new Revision();
+        listener.newRevision(revision);
 
-        final var exception = assertThrows(NotImplementedException.class, () -> listener.entityChanged(
-                null, null, null, null, null));
+        assertThat(revision.getExternalUserId()).isEqualTo("john");
+    }
 
-        assertThat(exception.getMessage()).isEqualTo("Not implemented yet");
+    @Test
+    void mustSetNullUsernameWhenSecurityContextHasNoAuthenticationOnNewRevision() {
+        SecurityContextHolder.setContext(new SecurityContextImpl());
+
+        final var listener = new TrackingEntityRevisionListener();
+        final var revision = new Revision();
+        listener.newRevision(revision);
+
+        assertThat(revision.getExternalUserId()).isNull();
+    }
+
+    @Test
+    void mustSetUsernameFromSecurityContextOnEntityChanged() {
+        final var auth = new UsernamePasswordAuthenticationToken("jane", null, List.of());
+        SecurityContextHolder.setContext(new SecurityContextImpl(auth));
+
+        final var listener = new TrackingEntityRevisionListener();
+        final var revision = new Revision();
+        listener.entityChanged(Object.class, "Object", 1L, RevisionType.ADD, revision);
+
+        assertThat(revision.getExternalUserId()).isEqualTo("jane");
+    }
+
+    @Test
+    void mustSetNullUsernameWhenSecurityContextHasNoAuthenticationOnEntityChanged() {
+        SecurityContextHolder.setContext(new SecurityContextImpl());
+
+        final var listener = new TrackingEntityRevisionListener();
+        final var revision = new Revision();
+        listener.entityChanged(Object.class, "Object", 1L, RevisionType.MOD, revision);
+
+        assertThat(revision.getExternalUserId()).isNull();
     }
 }
