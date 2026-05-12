@@ -24,12 +24,12 @@ public abstract class AbstractRevisionRepository<T> implements RevisionRepositor
      * @return Revision
      */
     @Override
-    public Page<T> findRevisionsById(final UUID id, final Pageable pageable) {
+    public Page<RevisionDTO<T>> findRevisionsById(final UUID id, final Pageable pageable) {
         throw new NotImplementedException("You're probably the first to need it, so implement it for us...");
     }
 
     @Override
-    public Page<T> findRevisions(Pageable pageable) {
+    public Page<RevisionDTO<T>> findRevisions(Pageable pageable) {
         throw new NotImplementedException("You're probably the first to need it, so implement it for us...");
     }
 
