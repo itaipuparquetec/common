@@ -46,7 +46,7 @@ public class Revision implements Serializable {
     private long timestamp;
 
     /**
-     * Username of the logged user {@link Revision}
+     * ExternalUserId of the logged user {@link Revision}
      */
     private String externalUserId;
 
