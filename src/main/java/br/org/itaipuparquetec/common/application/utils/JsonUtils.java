@@ -3,15 +3,20 @@ package br.org.itaipuparquetec.common.application.utils;
 import br.org.itaipuparquetec.common.domain.exceptions.InvalidFieldException;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
+@Service
 public class JsonUtils {
-    private static final ObjectMapper MAPPER = new ObjectMapper();
+    private final ObjectMapper MAPPER;
 
-    private JsonUtils() {
-        throw new UnsupportedOperationException("Utility class should not be instantiated");
+
+    @Autowired
+    public JsonUtils(ObjectMapper mapper) {
+        this.MAPPER = mapper;
     }
 
-    public static String toJson(Object obj) {
+    public String toJson(Object obj) {
         try {
             return MAPPER.writeValueAsString(obj);
         } catch (JsonProcessingException e) {
@@ -19,7 +24,7 @@ public class JsonUtils {
         }
     }
 
-    public static <T> T fromJson(String json, Class<T> clazz) {
+    public <T> T fromJson(String json, Class<T> clazz) {
         try {
             return MAPPER.readValue(json, clazz);
         } catch (JsonProcessingException e) {

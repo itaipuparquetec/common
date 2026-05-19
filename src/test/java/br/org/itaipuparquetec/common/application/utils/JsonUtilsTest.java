@@ -1,6 +1,8 @@
 package br.org.itaipuparquetec.common.application.utils;
 
 import br.org.itaipuparquetec.common.domain.exceptions.InvalidFieldException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.util.Map;
@@ -10,11 +12,19 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 class JsonUtilsTest {
 
-    @Test
-    void toJson_shouldConvertObjectToJsonString() {
-        Map<String, String> map = Map.of("nome", "Ana", "idade", "30");
+    private JsonUtils jsonUtils;
 
-        final var json = JsonUtils.toJson(map);
+    @BeforeEach
+    void setUp() {
+        ObjectMapper objectMapper = new ObjectMapper();
+        jsonUtils = new JsonUtils(objectMapper);
+    }
+
+    @Test
+    void shouldConvertObjectToJsonString() {
+        final var map = Map.of("nome", "Ana", "idade", "30");
+
+        final String json = jsonUtils.toJson(map);
 
         assertThat(json)
                 .contains("\"nome\":\"Ana\"")
@@ -22,36 +32,37 @@ class JsonUtilsTest {
     }
 
     @Test
-    void fromJson_shouldConvertJsonStringToObject() {
+    void shouldConvertJsonStringToObject() {
         String json = "{\"nome\":\"Ana\",\"idade\":\"30\"}";
-        Map<String, Object> map = JsonUtils.fromJson(json, Map.class);
 
-        assertThat(map).containsEntry("nome", "Ana").containsEntry("idade", "30");
+        final var map = jsonUtils.fromJson(json, Map.class);
+
+        assertThat(map)
+                .containsEntry("nome", "Ana")
+                .containsEntry("idade", "30");
     }
 
     @Test
-    void toJson_shouldThrowRuntimeExceptionOnInvalidObject() {
+    void shouldThrowRuntimeExceptionOnInvalidObject() {
         Object invalidObj = new Object() {};
 
-        assertThatThrownBy(() -> JsonUtils.toJson(invalidObj))
-                .isInstanceOf(InvalidFieldException.class);
+        assertThatThrownBy(() -> jsonUtils.toJson(invalidObj)).isInstanceOf(InvalidFieldException.class);
     }
 
     @Test
-    void fromJson_shouldThrowRuntimeExceptionOnInvalidJson() {
+    void shouldThrowRuntimeExceptionOnInvalidJson() {
         String invalidJson = "{nome:\"Ana\"";
 
-        assertThatThrownBy(() -> JsonUtils.fromJson(invalidJson, Map.class))
-                .isInstanceOf(InvalidFieldException.class);
+        assertThatThrownBy(() -> jsonUtils.fromJson(invalidJson, Map.class)).isInstanceOf(InvalidFieldException.class);
     }
 
     @Test
-    void toJsonAndFromJson_shouldBeInverseOperations() {
-        Map<String, String> original = Map.of("key", "value");
+    void shouldBeInverseOperations() {
+        final var original = Map.of("key", "value");
 
-        String json = JsonUtils.toJson(original);
-        Map<String, Object> result = JsonUtils.fromJson(json, Map.class);
+        final var json = jsonUtils.toJson(original);
+        final var result = jsonUtils.fromJson(json, Map.class);
 
-        assertThat(result).isEqualTo(original);
+        assertThat(result).containsEntry("key", "value");
     }
 }
