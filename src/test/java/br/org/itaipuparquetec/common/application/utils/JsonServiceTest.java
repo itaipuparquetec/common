@@ -10,14 +10,14 @@ import java.util.Map;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-class JsonUtilsTest {
+class JsonServiceTest {
 
-    private JsonUtils jsonUtils;
+    private JsonService jsonUtils;
 
     @BeforeEach
     void setUp() {
         ObjectMapper objectMapper = new ObjectMapper();
-        jsonUtils = new JsonUtils(objectMapper);
+        jsonUtils = new JsonService(objectMapper);
     }
 
     @Test

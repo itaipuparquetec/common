@@ -7,12 +7,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
-public class JsonUtils {
+public class JsonService {
     private final ObjectMapper objectMapper;
 
 
     @Autowired
-    public JsonUtils(ObjectMapper mapper) {
+    public JsonService(ObjectMapper mapper) {
         this.objectMapper = mapper;
     }
 
