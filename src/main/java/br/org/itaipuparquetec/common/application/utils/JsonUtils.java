@@ -8,17 +8,17 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class JsonUtils {
-    private final ObjectMapper MAPPER;
+    private final ObjectMapper objectMapper;
 
 
     @Autowired
     public JsonUtils(ObjectMapper mapper) {
-        this.MAPPER = mapper;
+        this.objectMapper = mapper;
     }
 
     public String toJson(Object obj) {
         try {
-            return MAPPER.writeValueAsString(obj);
+            return objectMapper.writeValueAsString(obj);
         } catch (JsonProcessingException e) {
             throw new InvalidFieldException("Invalid obj: " + obj );
         }
@@ -26,7 +26,7 @@ public class JsonUtils {
 
     public <T> T fromJson(String json, Class<T> clazz) {
         try {
-            return MAPPER.readValue(json, clazz);
+            return objectMapper.readValue(json, clazz);
         } catch (JsonProcessingException e) {
             throw new InvalidFieldException("Invalid JSON: " + json );
         }
