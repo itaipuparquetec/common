@@ -37,9 +37,7 @@ class JsonServiceTest {
 
         final var map = jsonUtils.fromJson(json, Map.class);
 
-        assertThat(map)
-                .containsEntry("nome", "Ana")
-                .containsEntry("idade", "30");
+        assertThat(map).containsEntry("nome", "Ana").containsEntry("idade", "30");
     }
 
     @Test
