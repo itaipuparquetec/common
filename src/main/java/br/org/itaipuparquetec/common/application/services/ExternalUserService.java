@@ -4,11 +4,9 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 /**
- *
- * @author cristian.souza
- * @version 1.0.0
- * @since 14/10/2025
+ * @deprecated Use {@link FindUsersByUsernameFromExternalPlatform} instead.
  */
+@Deprecated(forRemoval = true)
 public interface ExternalUserService {
 
     Page<ExternalUserResponse> listExternalUsersByFilter(final String search, final Pageable pageable);
