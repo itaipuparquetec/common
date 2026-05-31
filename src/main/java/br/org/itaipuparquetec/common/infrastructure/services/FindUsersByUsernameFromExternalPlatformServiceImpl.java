@@ -1,6 +1,6 @@
 package br.org.itaipuparquetec.common.infrastructure.services;
 
-import br.org.itaipuparquetec.common.application.services.ExternalUserService;
+import br.org.itaipuparquetec.common.application.services.FindUsersByUsernameFromExternalPlatformService;
 import br.org.itaipuparquetec.common.infrastructure.keycloak.KeycloakAdminApi;
 import br.org.itaipuparquetec.common.infrastructure.keycloak.KeycloakProperties;
 import lombok.RequiredArgsConstructor;
@@ -8,6 +8,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+
 import java.util.List;
 import java.util.Map;
 
@@ -19,7 +20,7 @@ import java.util.Map;
  */
 @Service
 @RequiredArgsConstructor
-public class ExternalUserServiceImpl implements ExternalUserService {
+public class FindUsersByUsernameFromExternalPlatformServiceImpl implements FindUsersByUsernameFromExternalPlatformService {
 
     private final KeycloakAdminApi keycloakAdminApi;
     private final KeycloakProperties keycloakProperties;
@@ -58,12 +59,7 @@ public class ExternalUserServiceImpl implements ExternalUserService {
             fullName = username != null ? username : "";
         }
 
-        return new ExternalUserResponse(
-                username,
-                email,
-                fullName,
-                id
-        );
+        return new ExternalUserResponse(username, email, fullName, null, null, id);
     }
 
     private String asString(final Object value) {
