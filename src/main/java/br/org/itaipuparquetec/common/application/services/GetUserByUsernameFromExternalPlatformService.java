@@ -1,6 +1,6 @@
 package br.org.itaipuparquetec.common.application.services;
 
-public interface GetUserByUsernameFromExternalPlatform {
+public interface GetUserByUsernameFromExternalPlatformService {
 
     UserOutput execute(final String usernameFilter);
 
