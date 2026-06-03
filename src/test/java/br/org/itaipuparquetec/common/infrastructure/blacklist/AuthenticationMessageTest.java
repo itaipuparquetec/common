@@ -8,10 +8,9 @@ class AuthenticationMessageTest {
 
     @Test
     void tokenCanBeSetAndRead() {
-        final var message = new AuthenticationMessage();
-        message.token = "token123";
+        final var message = new AuthenticationMessage("token123");
 
-        final var token = message.token;
+        final var token = message.token();
 
         assertThat(token).isEqualTo("token123");
     }

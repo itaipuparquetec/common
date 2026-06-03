@@ -4,9 +4,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThatCode;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.*;
 
 class ReceiveKafkaMessageTest {
 
@@ -21,8 +19,7 @@ class ReceiveKafkaMessageTest {
 
     @Test
     void revokeCalledWhenMessageReceived() {
-        final var message = new AuthenticationMessage();
-        message.token = "token-value";
+        final var message = new AuthenticationMessage("token-value");
 
         receiver.listenBlackListTopic(message);
 
@@ -31,8 +28,7 @@ class ReceiveKafkaMessageTest {
 
     @Test
     void handlesExceptionFromRevoke() {
-        final var message = new AuthenticationMessage();
-        message.token = "bad-token";
+        final var message = new AuthenticationMessage("bad-token");
         doThrow(new RuntimeException("boom")).when(tokenBlacklist).revoke("bad-token");
 
         assertThatCode(() -> receiver.listenBlackListTopic(message)).doesNotThrowAnyException();

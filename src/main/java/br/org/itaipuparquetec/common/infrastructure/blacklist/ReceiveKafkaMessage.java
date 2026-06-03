@@ -18,7 +18,7 @@ public class ReceiveKafkaMessage {
 
             log.info("Received message from BLACK_LIST_TOPIC");
 
-            tokenBlacklist.revoke(authenticationMessage.token);
+            tokenBlacklist.revoke(authenticationMessage.token());
 
         } catch (Exception e) {
             log.error("Error processing blacklist message: {}", e.getMessage());

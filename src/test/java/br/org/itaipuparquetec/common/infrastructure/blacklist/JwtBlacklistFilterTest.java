@@ -9,7 +9,6 @@ import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
 
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 
 class JwtBlacklistFilterTest {
@@ -46,7 +45,8 @@ class JwtBlacklistFilterTest {
 
         jwtBlacklistFilter.doFilterInternal(request, response, chain);
 
-        verify(response, times(1)).sendError(eq(HttpServletResponse.SC_UNAUTHORIZED), eq("Token revogado"));
+        verify(response, times(1))
+                .sendError(HttpServletResponse.SC_UNAUTHORIZED, "Token revogado");
         verify(chain, never()).doFilter(any(), any());
     }
 
