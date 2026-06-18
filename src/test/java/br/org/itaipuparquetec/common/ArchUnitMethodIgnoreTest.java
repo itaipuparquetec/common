@@ -30,11 +30,9 @@ class ArchUnitMethodIgnoreTest {
         assertThat(retention).isNull();
     }
 
-    /**
-     * This method is empty to test annotation ArchUnitMethodIgnore.
-     */
     @ArchUnitMethodIgnore
     void annotatedMethod() {
+        throw new UnsupportedOperationException("Is empty to test annotation ArchUnitMethodIgnore");
     }
 
     @Test
