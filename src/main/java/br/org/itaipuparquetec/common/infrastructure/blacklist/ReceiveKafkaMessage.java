@@ -15,7 +15,7 @@ public class ReceiveKafkaMessage {
     private final TokenBlacklist tokenBlacklist;
     private final KafkaTemplate<String, AuthenticationMessage> kafkaTemplate;
 
-    @KafkaListener(topics = BLACK_LIST_TOPIC)
+    @KafkaListener(topics = BLACK_LIST_TOPIC, autoStartup = "${kafka.blacklist-listener.enabled:false}")
     public void listenBlackListTopic(AuthenticationMessage authenticationMessage) {
         try {
 
