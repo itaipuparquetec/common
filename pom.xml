@@ -64,6 +64,9 @@
         <maven-javadoc-plugin.version>3.6.3</maven-javadoc-plugin.version>
         <mockito-core.version>5.21.0</mockito-core.version>
 
+        <jackson-annotations.version>2.19.4</jackson-annotations.version>
+        <jackson-databind.version>2.19.4</jackson-databind.version>
+
         <sonar-maven-plugin.version>3.11.0.3922</sonar-maven-plugin.version>
         <sonar.java.binaries>target/classes</sonar.java.binaries>
     </properties>
@@ -116,6 +119,12 @@
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-annotations</artifactId>
             <version>${jackson-annotations.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+            <version>${jackson-databind.version}</version>
+            <scope>provided</scope>
         </dependency>
 
         <dependency>
