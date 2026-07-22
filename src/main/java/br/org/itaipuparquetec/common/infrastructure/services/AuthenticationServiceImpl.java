@@ -3,12 +3,10 @@ package br.org.itaipuparquetec.common.infrastructure.services;
 import br.org.itaipuparquetec.common.application.services.AuthenticationService;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
-import org.springframework.stereotype.Service;
 
 import java.util.Arrays;
 import java.util.stream.Stream;
 
-@Service
 public class AuthenticationServiceImpl implements AuthenticationService {
 
     @Override
