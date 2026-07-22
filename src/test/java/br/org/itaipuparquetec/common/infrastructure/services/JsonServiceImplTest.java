@@ -1,5 +1,6 @@
-package br.org.itaipuparquetec.common.application.utils;
+package br.org.itaipuparquetec.common.infrastructure.services;
 
+import br.org.itaipuparquetec.common.application.services.JsonService;
 import br.org.itaipuparquetec.common.domain.exceptions.InvalidFieldException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
@@ -10,14 +11,14 @@ import java.util.Map;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-class JsonServiceTest {
+class JsonServiceImplTest {
 
     private JsonService jsonUtils;
 
     @BeforeEach
     void setUp() {
         ObjectMapper objectMapper = new ObjectMapper();
-        jsonUtils = new JsonService(objectMapper);
+        jsonUtils = new JsonServiceImpl(objectMapper);
     }
 
     @Test

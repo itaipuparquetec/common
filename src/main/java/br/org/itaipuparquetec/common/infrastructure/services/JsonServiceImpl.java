@@ -1,21 +1,19 @@
-package br.org.itaipuparquetec.common.application.utils;
+package br.org.itaipuparquetec.common.infrastructure.services;
 
+import br.org.itaipuparquetec.common.application.services.JsonService;
 import br.org.itaipuparquetec.common.domain.exceptions.InvalidFieldException;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 @Service
-public class JsonService {
+@RequiredArgsConstructor
+public class JsonServiceImpl implements JsonService {
+
     private final ObjectMapper objectMapper;
 
-
-    @Autowired
-    public JsonService(ObjectMapper mapper) {
-        this.objectMapper = mapper;
-    }
-
+    @Override
     public String toJson(Object obj) {
         try {
             return objectMapper.writeValueAsString(obj);
@@ -24,6 +22,7 @@ public class JsonService {
         }
     }
 
+    @Override
     public <T> T fromJson(String json, Class<T> clazz) {
         try {
             return objectMapper.readValue(json, clazz);
