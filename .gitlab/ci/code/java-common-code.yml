@@ -6,9 +6,7 @@ java-common-lint:
     - mvn compile checkstyle:check
   rules:
     - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
-      changes: [ ./**/* ]
     - if: '$CI_COMMIT_BRANCH == "main" && $CI_PIPELINE_SOURCE == "push"'
-      changes: [ ./**/* ]
     - when: never
 
 java-common-tests:
