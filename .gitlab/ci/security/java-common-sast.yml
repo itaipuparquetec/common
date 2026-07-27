@@ -1,4 +1,4 @@
-common-sast:
+java-common-sast:
   stage: security
   retry: 2
   image: semgrep/semgrep:latest

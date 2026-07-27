@@ -1,4 +1,4 @@
-common-sbom:
+java-common-sbom:
   stage: security
   retry: 2
   image: alpine:latest
