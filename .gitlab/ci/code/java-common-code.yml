@@ -17,7 +17,7 @@ java-common-tests:
   tags:
     - common
   needs:
-    - job: lint
+    - job: java-common-lint
       artifacts: false
   script:
     - mvn clean verify
