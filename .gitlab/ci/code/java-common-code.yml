@@ -49,7 +49,7 @@ java-common-quality-gate:
   variables:
     GIT_DEPTH: "0"
   needs:
-    - job: tests
+    - job: java-common-tests
       artifacts: true
   script:
     - mvn sonar:sonar -Dsonar.qualitygate.wait=true
@@ -63,7 +63,7 @@ java-common-deploy:
   tags:
     - common
   needs:
-    - job: quality-gate
+    - job: java-common-quality-gate
       artifacts: true
   before_script:
     - mkdir -p ~/.m2
