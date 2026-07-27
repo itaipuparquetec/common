@@ -1,7 +1,16 @@
 package br.org.itaipuparquetec.common.infrastructure.rest;
 
 import br.org.itaipuparquetec.common.application.services.LocaleService;
-import br.org.itaipuparquetec.common.domain.exceptions.*;
+import br.org.itaipuparquetec.common.domain.exceptions.AlreadyExistsFieldException;
+import br.org.itaipuparquetec.common.domain.exceptions.AlreadyExistsFieldsException;
+import br.org.itaipuparquetec.common.domain.exceptions.EmptyFieldException;
+import br.org.itaipuparquetec.common.domain.exceptions.ForbiddenException;
+import br.org.itaipuparquetec.common.domain.exceptions.InvalidFieldException;
+import br.org.itaipuparquetec.common.domain.exceptions.LessThanZeroFieldException;
+import br.org.itaipuparquetec.common.domain.exceptions.NotFoundRegisterException;
+import br.org.itaipuparquetec.common.domain.exceptions.NullFieldException;
+import br.org.itaipuparquetec.common.domain.exceptions.TooLargeFieldException;
+import br.org.itaipuparquetec.common.domain.exceptions.TooShortFieldException;
 import br.org.itaipuparquetec.common.infrastructure.formatters.FieldFormatter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.MessageSource;
@@ -62,7 +71,7 @@ public class RestResponseEntityExceptionHandler extends ResponseEntityExceptionH
         return handleExceptionInternal(exception, messageOfError, new HttpHeaders(), HttpStatus.BAD_REQUEST, request);
     }
 
-    private String[] getTranslatedAttributes(String[] rawAttributes) {
+    private String[] getTranslatedAttributes(final String[] rawAttributes) {
         return Arrays.stream(rawAttributes).map(String::trim)
                 .map(rawAttribute -> messageSource.getMessage(rawAttribute, new String[]{}, localeService.getLocale()))
                 .toArray(String[]::new);
@@ -72,7 +81,7 @@ public class RestResponseEntityExceptionHandler extends ResponseEntityExceptionH
         return messageSource.getMessage("and", new String[]{}, localeService.getLocale());
     }
 
-    public String getFormattedTranslatedAttributes(String[] rawTranslatedAttributes) {
+    public String getFormattedTranslatedAttributes(final String[] rawTranslatedAttributes) {
         final var conjunction = getConjunction();
 
         return FieldFormatter.format(conjunction, rawTranslatedAttributes);
@@ -163,8 +172,8 @@ public class RestResponseEntityExceptionHandler extends ResponseEntityExceptionH
         return handleExceptionInternal(exception, message, new HttpHeaders(), HttpStatus.INTERNAL_SERVER_ERROR, request);
     }
 
-    ResponseEntity<Object> handleExceptionInternal(Exception exception, String messageOfError, HttpHeaders headers,
-                                                   HttpStatusCode statusCode, WebRequest webRequest) {
+    ResponseEntity<Object> handleExceptionInternal(final Exception exception, final String messageOfError, final HttpHeaders headers,
+                                                   final HttpStatusCode statusCode, final WebRequest webRequest) {
         return super.handleExceptionInternal(exception, new Error(messageOfError), headers, statusCode, webRequest);
     }
 

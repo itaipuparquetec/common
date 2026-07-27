@@ -16,7 +16,7 @@ public class ReceiveKafkaMessage {
     private final KafkaTemplate<String, AuthenticationMessage> kafkaTemplate;
 
     @KafkaListener(topics = BLACK_LIST_TOPIC, autoStartup = "${kafka.blacklist-listener.enabled:false}")
-    public void listenBlackListTopic(AuthenticationMessage authenticationMessage) {
+    public void listenBlackListTopic(final AuthenticationMessage authenticationMessage) {
         try {
 
             log.info("Received message from BLACK_LIST_TOPIC");
@@ -30,9 +30,9 @@ public class ReceiveKafkaMessage {
     }
 
     @KafkaListener(topics = BLACK_LIST_RETRY_TOPIC, autoStartup = "${kafka.blacklist-listener.enabled:false}")
-    public void listenBlackListRetryTopic(AuthenticationMessage authenticationMessage) {
-            log.info("Received message from BLACK_LIST_RETRY_TOPIC");
+    public void listenBlackListRetryTopic(final AuthenticationMessage authenticationMessage) {
+        log.info("Received message from BLACK_LIST_RETRY_TOPIC");
 
-            tokenBlacklist.revoke(authenticationMessage.token());
+        tokenBlacklist.revoke(authenticationMessage.token());
     }
 }

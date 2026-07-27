@@ -14,20 +14,20 @@ public class JsonServiceImpl implements JsonService {
     private final ObjectMapper objectMapper;
 
     @Override
-    public String toJson(Object obj) {
+    public String toJson(final Object obj) {
         try {
             return objectMapper.writeValueAsString(obj);
         } catch (JsonProcessingException e) {
-            throw new InvalidFieldException("Invalid obj: " + obj );
+            throw new InvalidFieldException("Invalid obj: " + obj);
         }
     }
 
     @Override
-    public <T> T fromJson(String json, Class<T> clazz) {
+    public <T> T fromJson(final String json, final Class<T> clazz) {
         try {
             return objectMapper.readValue(json, clazz);
         } catch (JsonProcessingException e) {
-            throw new InvalidFieldException("Invalid JSON: " + json );
+            throw new InvalidFieldException("Invalid JSON: " + json);
         }
     }
 }

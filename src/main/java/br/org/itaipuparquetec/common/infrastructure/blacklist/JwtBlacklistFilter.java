@@ -16,8 +16,8 @@ public class JwtBlacklistFilter extends OncePerRequestFilter {
     private final TokenBlacklist tokenBlacklist;
 
     @Override
-    protected void doFilterInternal(HttpServletRequest request,
-                                    @NonNull HttpServletResponse response, @NonNull FilterChain filterChain)
+    protected void doFilterInternal(final HttpServletRequest request,
+                                    @NonNull final HttpServletResponse response, @NonNull final FilterChain filterChain)
             throws ServletException, IOException {
         final var authHeader = request.getHeader("Authorization");
 

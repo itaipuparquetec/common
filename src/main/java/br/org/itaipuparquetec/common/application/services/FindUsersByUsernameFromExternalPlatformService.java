@@ -5,9 +5,9 @@ import org.springframework.data.domain.Pageable;
 
 public interface FindUsersByUsernameFromExternalPlatformService {
 
-    Page<ExternalUserResponse> listExternalUsersByFilter(final String usernameFilter, final Pageable pageable);
+    Page<ExternalUserResponse> listExternalUsersByFilter(String usernameFilter, Pageable pageable);
 
     record ExternalUserResponse(String username, String email, String name, String firstName,
-                      String lastName, String externalAuthenticationPlatformId) {
+                                String lastName, String externalAuthenticationPlatformId) {
     }
 }

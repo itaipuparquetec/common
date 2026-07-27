@@ -7,7 +7,7 @@ import java.util.UUID;
 
 public interface RevisionRepository<T> {
 
-    Page<RevisionDTO<T>> findRevisionsById(final UUID id, Pageable pageable);
+    Page<RevisionDTO<T>> findRevisionsById(UUID id, Pageable pageable);
 
     Page<RevisionDTO<T>> findRevisions(Pageable pageable);
 

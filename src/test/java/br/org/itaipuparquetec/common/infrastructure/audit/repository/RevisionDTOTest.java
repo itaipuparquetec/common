@@ -56,12 +56,12 @@ class RevisionDTOTest {
         final var dto = new RevisionDTO<String>();
         final var now = LocalDateTime.now();
 
-        dto.dateTime = now;
+        dto.setDateTime(now);
         dto.setRevisionId(42L);
         dto.setType(RevisionType.ADD);
         dto.setEntity("payload");
 
-        assertThat(dto.dateTime).isEqualTo(now);
+        assertThat(dto.getDateTime()).isEqualTo(now);
         assertThat(dto.getRevisionId()).isEqualTo(42L);
         assertThat(dto.getType()).isEqualTo(RevisionType.ADD);
         assertThat(dto.getEntity()).isEqualTo("payload");

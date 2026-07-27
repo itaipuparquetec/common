@@ -8,7 +8,7 @@ public final class FieldFormatter {
         throw new IllegalStateException("Utility class");
     }
 
-    public static String format(String conjunction, String... fields) {
+    public static String format(final String conjunction, final String... fields) {
         if (fields == null || fields.length == 0) {
             return "";
         }

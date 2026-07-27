@@ -4,7 +4,7 @@ public class EmptyFieldException extends RuntimeException {
 
     static final String NOT_EMPTY_MESSAGE = "The field \"%s\" cannot be empty.";
 
-    public EmptyFieldException(String field) {
+    public EmptyFieldException(final String field) {
         super(NOT_EMPTY_MESSAGE.formatted(field));
     }
 }

@@ -1,0 +1,3 @@
+[allowlist]
+description = "Arquivos de configuração históricos com segredos já removidos do repositório"
+paths = []

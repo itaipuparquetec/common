@@ -1,8 +1,8 @@
 package br.org.itaipuparquetec.common.infrastructure.keycloak;
 
 public record KeycloakTokenResponse(
-    String access_token,
-    Integer expires_in
+        String access_token,
+        Integer expires_in
 ) {
     public KeycloakTokenResponse {
         if (expires_in == null) {

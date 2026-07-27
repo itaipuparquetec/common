@@ -9,4 +9,5 @@ public record KeycloakProperties(
         String clientId,
         String clientSecret,
         int tokenSafetyMarginSeconds
-) {}
+) {
+}

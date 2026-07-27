@@ -12,7 +12,7 @@ public class TrackingEntityRevisionListener implements EntityTrackingRevisionLis
     }
 
     @Override
-    public void entityChanged(Class entityClass, String entityName, Object entityId, RevisionType revisionType, Object revisionEntity) {
+    public void entityChanged(final Class entityClass, final String entityName, final Object entityId, final RevisionType revisionType, final Object revisionEntity) {
         ((Revision) revisionEntity).setExternalUserId(getExternalUserId());
     }
 

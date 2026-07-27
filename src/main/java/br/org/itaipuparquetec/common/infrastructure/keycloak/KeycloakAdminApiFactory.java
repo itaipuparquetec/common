@@ -9,8 +9,7 @@ import org.springframework.web.service.invoker.HttpServiceProxyFactory;
 public class KeycloakAdminApiFactory {
 
     @Bean
-    KeycloakAdminApi keycloakAdminApi(@Qualifier("keycloakHttpServiceProxyFactory")
-                                      final HttpServiceProxyFactory keycloakHttpServiceProxyFactory) {
+    KeycloakAdminApi keycloakAdminApi(@Qualifier("keycloakHttpServiceProxyFactory") final HttpServiceProxyFactory keycloakHttpServiceProxyFactory) {
         return keycloakHttpServiceProxyFactory.createClient(KeycloakAdminApi.class);
     }
 }

@@ -17,9 +17,10 @@ public class PageResponse<T> {
     private List<T> content;
     private long totalElements;
 
-    public PageResponse() {}
+    public PageResponse() {
+    }
 
-    public PageResponse(Page<T> page) {
+    public PageResponse(final Page<T> page) {
         this.content = page.getContent();
         this.totalPages = page.getSize() == 0 ? 1 : (int) Math.ceil((double) page.getTotalElements() / (double) page.getSize());
         this.totalElements = page.getTotalElements();

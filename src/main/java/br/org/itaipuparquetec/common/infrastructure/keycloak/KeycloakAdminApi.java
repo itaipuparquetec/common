@@ -14,18 +14,18 @@ public interface KeycloakAdminApi {
 
     @GetExchange("/admin/realms/{realm}/users")
     List<Map<String, Object>> listUsers(
-            @PathVariable("realm") final String realm,
-            @RequestParam("briefRepresentation") final boolean briefRepresentation,
-            @RequestParam("search") final String search,
-            @RequestParam("exact") final boolean exact,
-            @RequestParam("first") final int first,
-            @RequestParam("max") final int max
+            @PathVariable("realm") String realm,
+            @RequestParam("briefRepresentation") boolean briefRepresentation,
+            @RequestParam("search") String search,
+            @RequestParam("exact") boolean exact,
+            @RequestParam("first") int first,
+            @RequestParam("max") int max
     );
 
     @GetExchange("/admin/realms/{realm}/users/count")
     Long countUsers(
-            @PathVariable("realm") final String realm,
-            @RequestParam("search") final String search,
-            @RequestParam("exact") final boolean exact
+            @PathVariable("realm") String realm,
+            @RequestParam("search") String search,
+            @RequestParam("exact") boolean exact
     );
 }

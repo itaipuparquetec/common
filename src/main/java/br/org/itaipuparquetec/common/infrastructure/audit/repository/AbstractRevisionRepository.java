@@ -42,8 +42,7 @@ public abstract class AbstractRevisionRepository<T> implements RevisionRepositor
                 .addProjection(AuditEntity.revisionNumber().count())
                 .getSingleResult();
 
-        @SuppressWarnings("unchecked")
-        final List<Object[]> rawResults = auditReader.createQuery()
+        @SuppressWarnings("unchecked") final List<Object[]> rawResults = auditReader.createQuery()
                 .forRevisionsOfEntityWithChanges(clazz, false)
                 .add(AuditEntity.id().eq(id))
                 .setFirstResult((int) pageable.getOffset())
@@ -73,10 +72,10 @@ public abstract class AbstractRevisionRepository<T> implements RevisionRepositor
 
         final var revision = (Revision) row[1];
         dto.setRevisionId(revision.getId());
-        dto.dateTime = LocalDateTime.ofInstant(
+        dto.setDateTime(LocalDateTime.ofInstant(
                 Instant.ofEpochMilli(revision.getTimestamp()),
                 ZoneId.systemDefault()
-        );
+        ));
         dto.setExternalUserId(revision.getExternalUserId());
         dto.setType((RevisionType) row[2]);
 

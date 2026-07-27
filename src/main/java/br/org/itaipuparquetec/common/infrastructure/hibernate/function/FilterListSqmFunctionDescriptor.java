@@ -15,7 +15,7 @@ import java.util.List;
 
 public class FilterListSqmFunctionDescriptor extends AbstractSqmSelfRenderingFunctionDescriptor {
 
-    public FilterListSqmFunctionDescriptor(TypeConfiguration typeConfiguration) {
+    public FilterListSqmFunctionDescriptor(final TypeConfiguration typeConfiguration) {
         super(
                 "FILTERER",
                 FunctionKind.NORMAL,
@@ -28,7 +28,7 @@ public class FilterListSqmFunctionDescriptor extends AbstractSqmSelfRenderingFun
     }
 
     @Override
-    public void render(SqlAppender sqlAppender, List<? extends SqlAstNode> sqlAstArguments, ReturnableType<?> returnType, SqlAstTranslator<?> walker) {
+    public void render(final SqlAppender sqlAppender, final List<? extends SqlAstNode> sqlAstArguments, final ReturnableType<?> returnType, final SqlAstTranslator<?> walker) {
 
         sqlAppender.appendSql("(");
 

@@ -6,4 +6,5 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 public record KeycloakHttpProperties(
         int connectTimeoutMs,
         int readTimeoutMs
-) {}
+) {
+}

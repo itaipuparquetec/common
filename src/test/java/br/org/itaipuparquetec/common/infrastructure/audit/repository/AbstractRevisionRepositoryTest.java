@@ -21,16 +21,14 @@ import static org.mockito.Mockito.*;
 class AbstractRevisionRepositoryTest {
 
     private AuditReader auditReader;
-    private AuditQueryCreator countQueryCreator;
-    private AuditQueryCreator contentQueryCreator;
     private AuditQuery countQuery;
     private AuditQuery contentQuery;
 
     @BeforeEach
     void setUp() {
         auditReader = mock(AuditReader.class);
-        countQueryCreator = mock(AuditQueryCreator.class);
-        contentQueryCreator = mock(AuditQueryCreator.class);
+        final var countQueryCreator = mock(AuditQueryCreator.class);
+        final var contentQueryCreator = mock(AuditQueryCreator.class);
         countQuery = mock(AuditQuery.class);
         contentQuery = mock(AuditQuery.class);
         when(auditReader.createQuery()).thenReturn(countQueryCreator).thenReturn(contentQueryCreator);
@@ -53,7 +51,7 @@ class AbstractRevisionRepositoryTest {
     void shouldReturnPageOfRevisionsById() {
         UUID id = UUID.randomUUID();
         final var pageable = PageRequest.of(0, 10);
-        var revision = mockRevision(1L, 1_700_000_000_000L, "john");
+        var revision = mockRevision(1L, "john");
         var entity = new Item();
         Object[] row = mockRow(entity, revision, RevisionType.ADD, Set.of("name", "group"));
         List<Object[]> rows = new ArrayList<>();
@@ -70,14 +68,14 @@ class AbstractRevisionRepositoryTest {
         assertThat(dto.getExternalUserId()).isEqualTo("john");
         assertThat(dto.getType()).isEqualTo(RevisionType.ADD);
         assertThat(dto.getChangedProps()).isNotNull();
-        assertThat(dto.dateTime).isNotNull();
+        assertThat(dto.getDateTime()).isNotNull();
     }
 
     @Test
     void shouldReturnNullChangedPropsWhenSetIsEmpty() {
         final var id = UUID.randomUUID();
         final var pageable = PageRequest.of(0, 10);
-        var revision = mockRevision(2L, 1_700_000_000_000L, "jane");
+        var revision = mockRevision(2L, "jane");
         var entity = new Item();
         Object[] row = mockRow(entity, revision, RevisionType.MOD, Set.of()); // Set vazio
         List<Object[]> rows = new ArrayList<>();
@@ -115,10 +113,10 @@ class AbstractRevisionRepositoryTest {
                 .contains("You're probably the first to need it, so implement it for us...");
     }
 
-    private Revision mockRevision(Long id, long timestamp, String user) {
+    private Revision mockRevision(Long id, String user) {
         var revision = mock(Revision.class);
         when(revision.getId()).thenReturn(id);
-        when(revision.getTimestamp()).thenReturn(timestamp);
+        when(revision.getTimestamp()).thenReturn(1700000000000L);
         when(revision.getExternalUserId()).thenReturn(user);
         return revision;
     }

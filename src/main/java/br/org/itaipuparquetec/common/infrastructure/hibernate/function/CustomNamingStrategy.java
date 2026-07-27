@@ -21,7 +21,7 @@ public class CustomNamingStrategy extends ImplicitNamingStrategyJpaCompliantImpl
      * @return
      */
     @Override
-    public Identifier determineForeignKeyName(ImplicitForeignKeyNameSource source) {
+    public Identifier determineForeignKeyName(final ImplicitForeignKeyNameSource source) {
         return this.toIdentifier("fk_" + source.getTableName().getCanonicalName()
                 + "_" + source.getReferencedTableName().getCanonicalName(), source.getBuildingContext());
     }
@@ -34,7 +34,7 @@ public class CustomNamingStrategy extends ImplicitNamingStrategyJpaCompliantImpl
      * @implNote this is not working due to this bug in Hibernate implementation
      */
     @Override
-    public Identifier determineUniqueKeyName(ImplicitUniqueKeyNameSource source) {
+    public Identifier determineUniqueKeyName(final ImplicitUniqueKeyNameSource source) {
         return this.toIdentifier("uk_" + source.getTableName().getCanonicalName(), source.getBuildingContext());
     }
 }

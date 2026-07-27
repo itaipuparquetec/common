@@ -43,7 +43,8 @@ class JsonServiceImplTest {
 
     @Test
     void shouldThrowRuntimeExceptionOnInvalidObject() {
-        Object invalidObj = new Object() {};
+        Object invalidObj = new Object() {
+        };
 
         assertThatThrownBy(() -> jsonUtils.toJson(invalidObj)).isInstanceOf(InvalidFieldException.class);
     }

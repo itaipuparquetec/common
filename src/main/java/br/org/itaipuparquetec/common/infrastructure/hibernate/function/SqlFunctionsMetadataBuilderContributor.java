@@ -4,11 +4,10 @@ import org.hibernate.boot.model.FunctionContributions;
 import org.hibernate.boot.model.FunctionContributor;
 import org.hibernate.type.spi.TypeConfiguration;
 
-
 public class SqlFunctionsMetadataBuilderContributor implements FunctionContributor {
 
     @Override
-    public void contributeFunctions(FunctionContributions functionContributions) {
+    public void contributeFunctions(final FunctionContributions functionContributions) {
         TypeConfiguration typeConfiguration = functionContributions.getTypeConfiguration();
 
         functionContributions.getFunctionRegistry().register(

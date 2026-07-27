@@ -1,6 +1,11 @@
 package br.org.itaipuparquetec.common.infrastructure.aid;
 
-import jakarta.validation.*;
+import jakarta.validation.Configuration;
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.ConstraintViolationException;
+import jakarta.validation.Validation;
+import jakarta.validation.Validator;
+import jakarta.validation.ValidatorFactory;
 
 import java.util.Set;
 
@@ -20,7 +25,7 @@ public final class StandaloneBeanValidation {
      *
      * @param bean {T}
      */
-    public static <T> void validate(T bean) {
+    public static <T> void validate(final T bean) {
         final Configuration<?> config = Validation.byDefaultProvider().configure();
         final ValidatorFactory factory = config.buildValidatorFactory();
         final Validator validator = factory.getValidator();

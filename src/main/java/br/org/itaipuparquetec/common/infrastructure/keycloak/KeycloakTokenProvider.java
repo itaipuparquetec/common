@@ -23,12 +23,11 @@ public class KeycloakTokenProvider {
     private volatile String cachedToken;
     private volatile Instant expiresAt = Instant.EPOCH;
 
-    public KeycloakTokenProvider(@Qualifier("keycloakRawWebClient") WebClient keycloakRawWebClient,
-                                 KeycloakProperties props) {
+    public KeycloakTokenProvider(@Qualifier("keycloakRawWebClient") final WebClient keycloakRawWebClient,
+                                 final KeycloakProperties props) {
         this.keycloakRawWebClient = keycloakRawWebClient;
         this.props = props;
     }
-
 
     public Mono<String> getOrRefresh() {
         if (cachedToken != null && Instant.now().isBefore(expiresAt.minusSeconds(props.tokenSafetyMarginSeconds()))) {

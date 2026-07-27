@@ -6,30 +6,31 @@ import org.hibernate.boot.model.naming.PhysicalNamingStrategy;
 import org.hibernate.engine.jdbc.env.spi.JdbcEnvironment;
 
 public class CustomPhysicalNamingStrategy implements PhysicalNamingStrategy {
-    private static final CamelCaseToUnderscoresNamingStrategy strategy = new CamelCaseToUnderscoresNamingStrategy();
+    private static final CamelCaseToUnderscoresNamingStrategy STRATEGY = new CamelCaseToUnderscoresNamingStrategy();
+
     @Override
-    public Identifier toPhysicalCatalogName(Identifier identifier, JdbcEnvironment jdbcEnvironment) {
-        return strategy.toPhysicalCatalogName(identifier, jdbcEnvironment);
+    public Identifier toPhysicalCatalogName(final Identifier identifier, final JdbcEnvironment jdbcEnvironment) {
+        return STRATEGY.toPhysicalCatalogName(identifier, jdbcEnvironment);
     }
 
     @Override
-    public Identifier toPhysicalSchemaName(Identifier identifier, JdbcEnvironment jdbcEnvironment) {
-        return strategy.toPhysicalSchemaName(identifier, jdbcEnvironment);
+    public Identifier toPhysicalSchemaName(final Identifier identifier, final JdbcEnvironment jdbcEnvironment) {
+        return STRATEGY.toPhysicalSchemaName(identifier, jdbcEnvironment);
     }
 
     @Override
-    public Identifier toPhysicalTableName(Identifier identifier, JdbcEnvironment jdbcEnvironment) {
-        Identifier physicalTableName = strategy.toPhysicalTableName(identifier, jdbcEnvironment);
+    public Identifier toPhysicalTableName(final Identifier identifier, final JdbcEnvironment jdbcEnvironment) {
+        Identifier physicalTableName = STRATEGY.toPhysicalTableName(identifier, jdbcEnvironment);
         return new Identifier(physicalTableName.getText(), true);
     }
 
     @Override
-    public Identifier toPhysicalSequenceName(Identifier identifier, JdbcEnvironment jdbcEnvironment) {
-        return strategy.toPhysicalSequenceName(identifier,jdbcEnvironment);
+    public Identifier toPhysicalSequenceName(final Identifier identifier, final JdbcEnvironment jdbcEnvironment) {
+        return STRATEGY.toPhysicalSequenceName(identifier, jdbcEnvironment);
     }
 
     @Override
-    public Identifier toPhysicalColumnName(Identifier logicalName, JdbcEnvironment jdbcEnvironment) {
-        return strategy.toPhysicalColumnName(logicalName, jdbcEnvironment);
+    public Identifier toPhysicalColumnName(final Identifier logicalName, final JdbcEnvironment jdbcEnvironment) {
+        return STRATEGY.toPhysicalColumnName(logicalName, jdbcEnvironment);
     }
 }

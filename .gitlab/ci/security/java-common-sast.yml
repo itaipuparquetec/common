@@ -1,0 +1,27 @@
+common-sast:
+  stage: security
+  retry: 2
+  image: semgrep/semgrep:latest
+  tags: [ common ]
+  script:
+    - |
+      semgrep scan \
+        --config p/java \
+        --config p/typescript \
+        --config p/owasp-top-ten \
+        --config p/secrets \
+        --sarif \
+        --output semgrep.sarif \
+        --no-rewrite-rule-ids \
+        .
+  artifacts:
+    when: always
+    expire_in: 1 week
+    paths:
+      - semgrep.sarif
+    reports:
+      sast: semgrep.sarif
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+    - if: '$CI_COMMIT_BRANCH == "main" && $CI_PIPELINE_SOURCE == "push"'
+    - when: never

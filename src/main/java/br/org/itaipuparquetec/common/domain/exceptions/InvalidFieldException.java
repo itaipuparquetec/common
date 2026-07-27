@@ -4,7 +4,7 @@ public class InvalidFieldException extends RuntimeException {
 
     static final String INVALID_FIELD_MESSAGE = "The field \"%s\" is invalid.";
 
-    public InvalidFieldException(String field) {
+    public InvalidFieldException(final String field) {
         super(INVALID_FIELD_MESSAGE.formatted(field));
     }
 }

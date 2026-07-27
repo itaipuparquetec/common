@@ -1,0 +1,305 @@
+<?xml version="1.0"?>
+<!DOCTYPE module PUBLIC
+        "-//Puppy Crawl//DTD Check Configuration 1.3//EN"
+        "https://checkstyle.org/dtds/configuration_1_3.dtd">
+
+<module name="Checker">
+
+    <property name="charset" value="UTF-8"/>
+    <property name="fileExtensions" value="java"/>
+
+    <!-- Relax style rules in test sources where method signatures are often dictated
+         by framework contracts (e.g. ArchCondition.check, JUnit lifecycle methods). -->
+    <module name="SuppressionSingleFilter">
+        <property name="files" value="[\\/]test[\\/]java[\\/].*\.java$"/>
+        <property name="checks" value="FinalParameters|EmptyLineSeparator"/>
+    </module>
+
+    <!-- Interface method parameters cannot meaningfully be 'final' (no body to enforce
+         immutability), so FinalParameters is suppressed for interface-only directories.
+         RedundantModifier correctly flags 'final' on abstract method params. -->
+    <module name="SuppressionSingleFilter">
+        <property name="files"
+                  value="[\\/](domain[\\/]gateways|application[\\/]services|infrastructure[\\/]jpa[\\/]repository[\\/]springdata|infrastructure[\\/]services[\\/]groups[\\/]api)[\\/][^/\\]+\.java$"/>
+        <property name="checks" value="FinalParameters"/>
+    </module>
+
+    <!-- ===== FILE-LEVEL CHECKS ===== -->
+
+    <module name="LineLength">
+        <property name="max" value="180"/>
+        <property name="ignorePattern" value="^package.*|^import.*"/>
+    </module>
+
+    <module name="RegexpSingleline">
+        <property name="format" value="\s+$"/>
+        <property name="minimum" value="0"/>
+        <property name="maximum" value="0"/>
+        <property name="message" value="Line has trailing spaces."/>
+    </module>
+
+    <!-- ===== LAYER NAMING CONVENTIONS =====
+         Statically enforces at compile-time the naming rules that ArchUnit
+         verifies at test time. A Checkstyle failure here prevents a miscreation
+         from even compiling, rather than waiting for the test suite to catch it. -->
+
+    <!-- mirrors ArchUnit: restsShouldHaveRestSuffix -->
+    <module name="RegexpOnFilename">
+        <property name="folderPattern" value="[\\/]infrastructure[\\/]rest[\\/]"/>
+        <property name="fileNamePattern" value="Rest\.java$"/>
+        <property name="match" value="false"/>
+        <message key="regexp.filename.mismatch"
+                 value="''{0}'': classes in infrastructure/rest/ must end with ''Rest''."/>
+    </module>
+
+    <module name="RegexpOnFilename">
+        <property name="folderPattern" value="[\\/]infrastructure[\\/]jpa[\\/]entities[\\/]"/>
+        <property name="fileNamePattern" value="JPA\.java$"/>
+        <property name="match" value="false"/>
+        <message key="regexp.filename.mismatch"
+                 value="''{0}'': JPA entity classes must end with ''JPA''."/>
+    </module>
+
+    <module name="RegexpOnFilename">
+        <property name="folderPattern" value="[\\/]infrastructure[\\/]jpa[\\/]repository[\\/]springdata[\\/]"/>
+        <property name="fileNamePattern" value="JPARepository\.java$"/>
+        <property name="match" value="false"/>
+        <message key="regexp.filename.mismatch"
+                 value="''{0}'': Spring Data interfaces must end with ''JPARepository''."/>
+    </module>
+
+    <!-- mirrors ArchUnit: repositoriesShouldHaveRepositorySuffix -->
+    <module name="RegexpOnFilename">
+        <property name="folderPattern" value="[\\/]infrastructure[\\/]jpa[\\/]repository[\\/](?!springdata)"/>
+        <property name="fileNamePattern" value="RepositoryImpl\.java$"/>
+        <property name="match" value="false"/>
+        <message key="regexp.filename.mismatch"
+                 value="''{0}'': JPA repository adapters must end with ''RepositoryImpl''."/>
+    </module>
+
+    <module name="RegexpOnFilename">
+        <property name="folderPattern" value="[\\/]domain[\\/]exceptions[\\/]"/>
+        <property name="fileNamePattern" value="Exception\.java$"/>
+        <property name="match" value="false"/>
+        <message key="regexp.filename.mismatch"
+                 value="''{0}'': domain exception classes must end with ''Exception''."/>
+    </module>
+
+    <module name="RegexpOnFilename">
+        <property name="folderPattern" value="[\\/]domain[\\/]gateways[\\/]"/>
+        <property name="fileNamePattern" value="(Repository|Service)\.java$"/>
+        <property name="match" value="false"/>
+        <message key="regexp.filename.mismatch"
+                 value="''{0}'': domain gateway interfaces must end with ''Repository'' or ''Service''."/>
+    </module>
+
+    <module name="RegexpOnFilename">
+        <property name="folderPattern" value="[\\/]application[\\/]usecases[\\/]"/>
+        <property name="fileNamePattern" value="UseCase(Impl)?\.java$"/>
+        <property name="match" value="false"/>
+        <message key="regexp.filename.mismatch"
+                 value="''{0}'': use case files must end with ''UseCase'' (interface) or ''UseCaseImpl'' (implementation)."/>
+    </module>
+
+    <!-- Classes that extend an exception type must have names ending with 'Exception'.
+         Mirrors ArchUnit: exceptionClassesMustEndWithException.
+         Catches single-line class declarations; ArchUnit covers multi-line and full
+         hierarchy (e.g. extending a domain-specific exception subclass). -->
+    <module name="RegexpSingleline">
+        <property name="format" value="class\s+(?!\w*Exception\b)\w+\s+extends\s+\w*Exception\b"/>
+        <property name="minimum" value="0"/>
+        <property name="maximum" value="0"/>
+        <property name="message" value="Classes that extend an exception must have names ending with ''Exception''."/>
+    </module>
+
+    <!-- ===== TREE WALKER ===== -->
+    <module name="TreeWalker">
+
+        <!-- ===== NAMING ===== -->
+
+        <module name="MethodName">
+            <property name="format" value="^[a-z][a-zA-Z0-9]*$"/>
+        </module>
+
+        <!-- Classes, enums, annotations, records: PascalCase -->
+        <module name="TypeName">
+            <property name="tokens" value="CLASS_DEF, ENUM_DEF, ANNOTATION_DEF, RECORD_DEF"/>
+            <property name="format" value="^[A-Z][a-zA-Z0-9]*$"/>
+        </module>
+
+        <!-- Interfaces: PascalCase, no 'I' prefix, no 'Impl' suffix.
+             mirrors ArchUnit: interfacesShouldNotHaveIPrefixOrImplSuffix -->
+        <module name="TypeName">
+            <property name="tokens" value="INTERFACE_DEF"/>
+            <property name="format" value="^(?!I[A-Z])(?!.*Impl$)[A-Z][a-zA-Z0-9]*$"/>
+            <message key="name.invalidPattern"
+                     value="Interface ''{0}'' must not start with ''I'' followed by an uppercase letter, nor end with ''Impl''."/>
+        </module>
+
+        <module name="ConstantName">
+            <property name="format" value="^[A-Z][A-Z0-9]*(_[A-Z0-9]+)*$"/>
+        </module>
+
+        <module name="MemberName">
+            <property name="format" value="^[a-z][a-zA-Z0-9]*$"/>
+        </module>
+
+        <module name="StaticVariableName">
+            <property name="format" value="^[a-z][a-zA-Z0-9]*$"/>
+        </module>
+
+        <module name="ParameterName">
+            <property name="format" value="^[a-z][a-zA-Z0-9]*$"/>
+        </module>
+
+        <module name="LocalVariableName">
+            <property name="format" value="^[a-z][a-zA-Z0-9]*$"/>
+        </module>
+
+        <module name="CatchParameterName">
+            <property name="format" value="^[a-z][a-zA-Z0-9]*$"/>
+        </module>
+
+        <!-- ===== IMPORTS ===== -->
+
+        <!-- Wildcard class imports are forbidden; static wildcards are allowed
+             (e.g. import static ArchRuleDefinition.*) -->
+        <module name="AvoidStarImport">
+            <property name="allowStaticMemberImports" value="true"/>
+        </module>
+        <module name="UnusedImports"/>
+        <module name="RedundantImport"/>
+
+        <!-- ===== BRACES AND BLOCKS ===== -->
+        <module name="NeedBraces">
+            <property name="allowSingleLineStatement" value="true"/>
+        </module>
+        <module name="LeftCurly"/>
+        <module name="RightCurly"/>
+
+        <module name="EmptyBlock">
+            <property name="option" value="TEXT"/>
+            <property name="tokens"
+                      value="LITERAL_TRY, LITERAL_FINALLY, LITERAL_IF, LITERAL_ELSE, LITERAL_SWITCH"/>
+        </module>
+
+        <!-- An empty catch block must reference the variable by a name that
+             communicates intent ('ignored' / 'expected') -->
+        <module name="EmptyCatchBlock">
+            <property name="exceptionVariableName" value="expected|ignored?"/>
+        </module>
+
+        <!-- ===== MODIFIERS ===== -->
+
+        <module name="ModifierOrder"/>
+
+        <!-- Remove modifiers that are implicit in context
+             (e.g. 'public abstract' on interface methods) -->
+        <module name="RedundantModifier"/>
+
+        <!-- ===== BEST PRACTICES ===== -->
+
+        <!-- All method parameters must be final — pervasive in the codebase,
+             promotes immutability, and prevents accidental re-assignment.
+             Mirrors the pattern of using constructor injection (ArchUnit: notAutowiredFields). -->
+        <module name="FinalParameters"/>
+
+        <!-- A class that exposes only private constructors (static factory pattern
+             used in domain models) must be declared final to prevent subclassing. -->
+        <module name="FinalClass"/>
+
+        <!-- String comparison must use .equals(), not == -->
+        <module name="StringLiteralEquality"/>
+
+        <!-- Overriding equals() requires overriding hashCode() -->
+        <module name="EqualsHashCode"/>
+
+        <!-- Object.finalize() is deprecated and must not be overridden -->
+        <module name="NoFinalizer"/>
+
+        <!-- default case must come last in switch statements -->
+        <module name="DefaultComesLast"/>
+
+        <!-- Avoid System.out / System.err — use a proper logger -->
+        <module name="Regexp">
+            <property name="format" value="System\.(out|err)\.print(ln|f)?"/>
+            <property name="illegalPattern" value="true"/>
+            <property name="message" value="Do not use System.out/System.err — use a logger instead."/>
+        </module>
+
+        <!-- ===== ENCAPSULATION ===== -->
+
+        <!-- Fields must be private.
+             protected is allowed for JPA inheritance (AbstractJPAEntity.id).
+             public static final constants are allowed. -->
+        <module name="VisibilityModifier">
+            <property name="protectedAllowed" value="true"/>
+            <property name="allowPublicImmutableFields" value="true"/>
+            <property name="allowPublicFinalFields" value="true"/>
+        </module>
+
+        <module name="OneTopLevelClass"/>
+        <module name="PackageDeclaration"/>
+
+        <!-- ===== WHITESPACE ===== -->
+
+        <module name="WhitespaceAround">
+            <property name="allowEmptyConstructors" value="true"/>
+            <property name="allowEmptyMethods" value="true"/>
+            <property name="allowEmptyTypes" value="true"/>
+            <property name="allowEmptyLoops" value="true"/>
+            <property name="allowEmptyLambdas" value="true"/>
+            <property name="ignoreEnhancedForColon" value="true"/>
+        </module>
+
+        <module name="WhitespaceAfter">
+            <property name="tokens"
+                      value="COMMA, SEMI, TYPECAST, LITERAL_IF, LITERAL_ELSE,
+                             LITERAL_WHILE, LITERAL_DO, LITERAL_FOR"/>
+        </module>
+
+        <module name="NoWhitespaceBefore">
+            <property name="tokens" value="SEMI, POST_INC, POST_DEC, DOT, GENERIC_END"/>
+            <property name="allowLineBreaks" value="true"/>
+        </module>
+
+        <!-- No spaces inside parentheses: method calls, casts, etc. -->
+        <module name="ParenPad"/>
+
+        <module name="GenericWhitespace"/>
+
+        <!-- When a method chain wraps, the dot leads the new line:
+               .whenNullOrEmpty(name, "name")
+               .thenThrows(); -->
+        <module name="SeparatorWrap">
+            <property name="tokens" value="DOT"/>
+            <property name="option" value="NL"/>
+        </module>
+
+        <!-- Commas stay at the end of the current line, never start the next -->
+        <module name="SeparatorWrap">
+            <property name="tokens" value="COMMA"/>
+            <property name="option" value="EOL"/>
+        </module>
+
+        <!-- Binary operators go to the start of the new line when the expression wraps:
+               && anotherCondition
+               || fallbackCondition -->
+        <module name="OperatorWrap">
+            <property name="option" value="NL"/>
+            <property name="tokens"
+                      value="BAND, BOR, BSR, BXOR, DIV, EQUAL, GE, GT, LAND, LE,
+                             LITERAL_INSTANCEOF, LOR, LT, MINUS, MOD, NOT_EQUAL, PLUS,
+                             QUESTION, SL, SR, STAR, METHOD_REF"/>
+        </module>
+
+        <!-- Blank line required between class members; consecutive fields may be grouped -->
+        <module name="EmptyLineSeparator">
+            <property name="allowNoEmptyLineBetweenFields" value="true"/>
+            <property name="allowMultipleEmptyLines" value="false"/>
+            <property name="allowMultipleEmptyLinesInsideClassMembers" value="false"/>
+        </module>
+
+    </module>
+
+</module>

@@ -10,8 +10,8 @@ import org.springframework.web.service.invoker.HttpServiceArgumentResolver;
 public class PageableArgumentResolver implements HttpServiceArgumentResolver {
 
     @Override
-    public boolean resolve(Object argument, @NonNull MethodParameter parameter,
-                           @NonNull HttpRequestValues.Builder requestValues) {
+    public boolean resolve(final Object argument, @NonNull final MethodParameter parameter,
+                           @NonNull final HttpRequestValues.Builder requestValues) {
         if (!(argument instanceof Pageable pageable)) {
             return false;
         }

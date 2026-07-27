@@ -17,11 +17,11 @@ public class TokenBlacklist {
                 .build();
     }
 
-    public void revoke(String token) {
+    public void revoke(final String token) {
         blacklist.put(token, true);
     }
 
-    public boolean isRevoked(String token) {
+    public boolean isRevoked(final String token) {
         return Boolean.TRUE.equals(blacklist.getIfPresent(token));
     }
 }

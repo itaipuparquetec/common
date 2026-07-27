@@ -4,5 +4,7 @@ public class ForbiddenException extends RuntimeException {
 
     static final String ACCESS_DENIED_MESSAGE = "Access denied to resource \"%s\".";
 
-    public ForbiddenException(String field) {super(ACCESS_DENIED_MESSAGE.formatted(field));}
+    public ForbiddenException(final String field) {
+        super(ACCESS_DENIED_MESSAGE.formatted(field));
+    }
 }

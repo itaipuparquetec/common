@@ -2,6 +2,7 @@ package br.org.itaipuparquetec.common.infrastructure.keycloak;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+
 import static org.mockito.Mockito.*;
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -14,6 +15,7 @@ import reactor.core.publisher.Mono;
 
 import org.springframework.web.reactive.function.client.ClientRequest;
 import org.springframework.web.reactive.function.client.WebClient;
+
 import java.util.*;
 
 class KeycloakHttpClientConfigTest {

@@ -12,7 +12,6 @@ import org.hibernate.envers.RevisionTimestamp;
 import java.io.Serial;
 import java.io.Serializable;
 
-
 @Data
 @jakarta.persistence.Entity
 @lombok.EqualsAndHashCode
