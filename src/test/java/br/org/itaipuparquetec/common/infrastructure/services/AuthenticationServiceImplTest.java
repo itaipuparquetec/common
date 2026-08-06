@@ -110,4 +110,11 @@ class AuthenticationServiceImplTest {
 
         assertThat(scopes).containsExactly("read");
     }
+
+    @Test
+    void shouldReturnTenantName() {
+        lenient().when(jwt.getClaims()).thenReturn(Map.of("tenant_name", "tenant-123"));
+
+        assertThat(authenticationService.getTenantName()).isEqualTo("tenant-123");
+    }
 }
