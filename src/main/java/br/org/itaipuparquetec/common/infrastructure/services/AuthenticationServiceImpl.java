@@ -61,4 +61,10 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
         return Arrays.stream(scope.split(" "));
     }
+
+    @Override
+    public String getTenantName() {
+        final var auth = SecurityContextHolder.getContext().getAuthentication();
+        return ((JwtAuthenticationToken) auth).getToken().getClaims().get("tenant_name").toString();
+    }
 }

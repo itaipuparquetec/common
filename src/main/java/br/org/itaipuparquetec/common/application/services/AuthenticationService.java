@@ -52,4 +52,9 @@ public interface AuthenticationService {
      */
     Stream<String> getScope();
 
+    /**
+     *
+     * @return the tenant name of an authenticated account from a token.
+     */
+    String getTenantName();
 }
