@@ -1,5 +1,6 @@
 package br.org.itaipuparquetec.common.infrastructure.audit;
 
+import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -35,7 +36,11 @@ public class Revision implements Serializable {
      */
     @Id
     @RevisionNumber
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "revision_generator")
+    @SequenceGenerator(
+            name = "revision_generator",
+            sequenceName = "revision_seq"
+    )
     private long id;
 
     /**
