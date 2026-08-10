@@ -46,6 +46,11 @@
 - Every new function gets a test. Bug fixes get a regression test.
 - Mock external I/O (API, DB, filesystem) with named fake classes, not inline stubs.
 - Tests must be F.I.R.S.T: fast, independent, repeatable, self-validating, timely.
+- Use AAA (Arrange, Act, Asserts) without comments.
+- Use private auxiliary methods at the end of the class.
+- Use @ParameterizedTests ever where possible or necessary.
+- Try to use only assertJ, unless you have a good reason not to.
+- Try to mock with Mockito without annotations like `@Mock`, `@InjectMocks`, `@MockBean`, unless you have a good reason not to.
 
 ## Dependencies
 
