@@ -40,7 +40,7 @@ class RestResponseEntityExceptionHandlerTest {
         when(messageSource.getMessage(keyCodeOfMessageExpected, new String[]{"campo1, campo2 e campo3"}, DEFAULT_LOCALE))
                 .thenReturn(errorMessageExpected);
         final var exception = new AlreadyExistsFieldsException(splitFieldsExpected);
-        final var webRequestExpected = Mockito.mock(WebRequest.class);
+        final var webRequestExpected = mock(WebRequest.class);
 
         restResponseEntityExceptionHandler.handleException(exception, webRequestExpected);
 
@@ -81,7 +81,7 @@ class RestResponseEntityExceptionHandlerTest {
         final String errorMessageExpected = "Error expected.";
         when(messageSource.getMessage(keyCodeOfMessageExpected, new String[]{"campo1"}, DEFAULT_LOCALE))
                 .thenReturn(errorMessageExpected);
-        final var webRequestExpected = Mockito.mock(WebRequest.class);
+        final var webRequestExpected = mock(WebRequest.class);
 
         restResponseEntityExceptionHandler.handleException(exception, webRequestExpected);
 
@@ -101,7 +101,7 @@ class RestResponseEntityExceptionHandlerTest {
         final String errorMessageExpected = "Error expected.";
         when(messageSource.getMessage(keyCodeOfMessageExpected, new String[]{"campo1"}, DEFAULT_LOCALE))
                 .thenReturn(errorMessageExpected);
-        final var webRequestExpected = Mockito.mock(WebRequest.class);
+        final var webRequestExpected = mock(WebRequest.class);
 
         restResponseEntityExceptionHandler.handleException(exception, webRequestExpected);
 
@@ -121,7 +121,7 @@ class RestResponseEntityExceptionHandlerTest {
         final String errorMessageExpected = "Error expected.";
         when(messageSource.getMessage(keyCodeOfMessageExpected, new String[]{"campo1"}, DEFAULT_LOCALE))
                 .thenReturn(errorMessageExpected);
-        final var webRequestExpected = Mockito.mock(WebRequest.class);
+        final var webRequestExpected = mock(WebRequest.class);
 
         restResponseEntityExceptionHandler.handleException(exception, webRequestExpected);
 
@@ -141,7 +141,7 @@ class RestResponseEntityExceptionHandlerTest {
         final String errorMessageExpected = "Error expected.";
         when(messageSource.getMessage(keyCodeOfMessageExpected, new String[]{"campo1"}, DEFAULT_LOCALE))
                 .thenReturn(errorMessageExpected);
-        final var webRequestExpected = Mockito.mock(WebRequest.class);
+        final var webRequestExpected = mock(WebRequest.class);
 
         restResponseEntityExceptionHandler.handleException(exception, webRequestExpected);
 
@@ -162,7 +162,7 @@ class RestResponseEntityExceptionHandlerTest {
         final String errorMessageExpected = "Error expected.";
         when(messageSource.getMessage(keyCodeOfMessageExpected, new String[]{"campo1"}, DEFAULT_LOCALE))
                 .thenReturn(errorMessageExpected);
-        final var webRequestExpected = Mockito.mock(WebRequest.class);
+        final var webRequestExpected = mock(WebRequest.class);
 
         restResponseEntityExceptionHandler.handleException(exception, webRequestExpected);
 
@@ -183,7 +183,7 @@ class RestResponseEntityExceptionHandlerTest {
         final String errorMessageExpected = "Error expected.";
         when(messageSource.getMessage(keyCodeOfMessageExpected, new String[]{"campo1"}, DEFAULT_LOCALE))
                 .thenReturn(errorMessageExpected);
-        final var webRequestExpected = Mockito.mock(WebRequest.class);
+        final var webRequestExpected = mock(WebRequest.class);
 
         restResponseEntityExceptionHandler.handleException(exception, webRequestExpected);
 
@@ -203,7 +203,7 @@ class RestResponseEntityExceptionHandlerTest {
         final String errorMessageExpected = "Error expected.";
         when(messageSource.getMessage(keyCodeOfMessageExpected, new String[]{"campo1"}, DEFAULT_LOCALE))
                 .thenReturn(errorMessageExpected);
-        final var webRequestExpected = Mockito.mock(WebRequest.class);
+        final var webRequestExpected = mock(WebRequest.class);
 
         restResponseEntityExceptionHandler.handleException(exception, webRequestExpected);
 
@@ -223,7 +223,7 @@ class RestResponseEntityExceptionHandlerTest {
         final String errorMessageExpected = "Error expected.";
         when(messageSource.getMessage(keyCodeOfMessageExpected, new String[]{"campo1"}, DEFAULT_LOCALE))
                 .thenReturn(errorMessageExpected);
-        final var webRequestExpected = Mockito.mock(WebRequest.class);
+        final var webRequestExpected = mock(WebRequest.class);
 
         restResponseEntityExceptionHandler.handleException(exception, webRequestExpected);
 
@@ -243,7 +243,7 @@ class RestResponseEntityExceptionHandlerTest {
         final String errorMessageExpected = "Error expected.";
         when(messageSource.getMessage(keyCodeOfMessageExpected, new String[]{"campo1"}, DEFAULT_LOCALE))
                 .thenReturn(errorMessageExpected);
-        final var webRequestExpected = Mockito.mock(WebRequest.class);
+        final var webRequestExpected = mock(WebRequest.class);
 
         restResponseEntityExceptionHandler.handleException(exception, webRequestExpected);
 
@@ -261,7 +261,7 @@ class RestResponseEntityExceptionHandlerTest {
         final String errorMessageExpected = "Error expected.";
         when(messageSource.getMessage(keyCodeOfMessageExpected, new String[]{}, DEFAULT_LOCALE))
                 .thenReturn(errorMessageExpected);
-        final var webRequestExpected = Mockito.mock(WebRequest.class);
+        final var webRequestExpected = mock(WebRequest.class);
 
         restResponseEntityExceptionHandler.handleException(exception, webRequestExpected);
 
@@ -278,7 +278,7 @@ class RestResponseEntityExceptionHandlerTest {
         final String errorMessageExpected = "Error expected.";
         when(messageSource.getMessage(keyCodeOfMessageExpected, new String[]{}, DEFAULT_LOCALE))
                 .thenReturn(errorMessageExpected);
-        final var webRequestExpected = Mockito.mock(WebRequest.class);
+        final var webRequestExpected = mock(WebRequest.class);
 
         restResponseEntityExceptionHandler.handleGenericException(exception, webRequestExpected);
 

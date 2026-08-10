@@ -1,10 +1,11 @@
 package br.org.itaipuparquetec.common.infrastructure.audit;
 
 import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import lombok.Data;
+import org.hibernate.annotations.GenericGenerator;
+import org.hibernate.annotations.Parameter;
 import org.hibernate.envers.RevisionEntity;
 import org.hibernate.envers.RevisionNumber;
 import org.hibernate.envers.RevisionTimestamp;
@@ -35,7 +36,16 @@ public class Revision implements Serializable {
      */
     @Id
     @RevisionNumber
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    @GeneratedValue(generator = "revision_generator")
+    @GenericGenerator(
+            name = "revision_generator",
+            strategy = "org.hibernate.id.enhanced.SequenceStyleGenerator",
+            parameters = {
+                    @Parameter(name = "sequence_name", value = "revision_seq"),
+                    @Parameter(name = "increment_size", value = "50"),
+                    @Parameter(name = "optimizer", value = "pooled-lo")
+            }
+    )
     private long id;
 
     /**

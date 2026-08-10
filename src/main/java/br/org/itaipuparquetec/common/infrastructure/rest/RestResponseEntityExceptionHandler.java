@@ -177,7 +177,7 @@ public class RestResponseEntityExceptionHandler extends ResponseEntityExceptionH
         return super.handleExceptionInternal(exception, new Error(messageOfError), headers, statusCode, webRequest);
     }
 
-    static String extractAttributeFromMessage(final String message) {
+    public static String extractAttributeFromMessage(final String message) {
         final var pattern = Pattern.compile("[\"']([^\"']+)[\"']");
         final var matcher = pattern.matcher(message);
         final List<String> atributos = new ArrayList<>();
