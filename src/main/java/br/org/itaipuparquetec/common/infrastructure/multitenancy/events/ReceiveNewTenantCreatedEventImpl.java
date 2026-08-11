@@ -8,9 +8,9 @@ import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.core.KafkaTemplate;
 
 /**
- * Recebe o evento de criação de um novo tenant para a migração do mesmo {@link ReceiveNewTenantCreatedEventImpl#handleNewTenantCreatedEvent}.
+ * Receives the creation event of a new tenant to migrate it {@link ReceiveNewTenantCreatedEventImpl#handleNewTenantCreatedEvent}.
  * </p>
- * Caso ocorra um erro durante a migração do tenant recém criado, realiza a retentativa em {@link ReceiveNewTenantCreatedEventImpl#handleNewTenantCreatedRetryEvent}.
+ * If an error occurs while migrating the newly created tenant, retries it in {@link ReceiveNewTenantCreatedEventImpl#handleNewTenantCreatedRetryEvent}.
  */
 @Slf4j
 @RequiredArgsConstructor

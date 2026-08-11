@@ -11,11 +11,11 @@ import javax.sql.DataSource;
 import java.util.HashMap;
 
 /**
- * Roteador de DataSources.
- * Faz o roteamento conforme o tenant resolvido por {@link TenantIdentifierServiceImpl}.
- * Seta o hubti como default no postConstruct.
+ * DataSource router.
+ * Routes according to the tenant resolved by {@link TenantIdentifierServiceImpl}.
+ * Sets hubti as the default in postConstruct.
  * </p>
- * Depende do bean PostgreSQLMigrationService, que realiza as migrations quando o sistema starta.
+ * Depends on the PostgreSQLMigrationService bean, which runs the migrations when the system starts.
  */
 @Slf4j
 @RequiredArgsConstructor

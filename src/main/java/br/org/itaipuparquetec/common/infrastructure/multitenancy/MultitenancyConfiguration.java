@@ -18,9 +18,9 @@ import org.springframework.context.annotation.DependsOn;
 import org.springframework.kafka.core.KafkaTemplate;
 
 /**
- * Registra a instrumentação de multitenancy standalone.
- * Só é ativada quando {@code hubti.multitenancy.enabled=true}, permitindo que microservices
- * com instrumentação própria (ex.: hubti-groups-api) não herdem estes beans.
+ * Registers the standalone multitenancy instrumentation.
+ * It is only enabled when {@code hubti.multitenancy.enabled=true}, allowing microservices
+ * with their own instrumentation (e.g. hubti-groups-api) to not inherit these beans.
  */
 @Configuration
 @ConditionalOnProperty(prefix = "hubti.multitenancy", name = "enabled", havingValue = "true")

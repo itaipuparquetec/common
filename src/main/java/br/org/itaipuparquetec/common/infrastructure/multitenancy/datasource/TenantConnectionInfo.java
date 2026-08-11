@@ -1,7 +1,7 @@
 package br.org.itaipuparquetec.common.infrastructure.multitenancy.datasource;
 
 /**
- * DTO com as informações para a criação do DataSource.
+ * DTO with the information to create the DataSource.
  *
  * @param jdbcUrl  {@link String}
  * @param username {@link String}

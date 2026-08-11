@@ -77,7 +77,7 @@ class AbstractRevisionRepositoryTest {
         final var pageable = PageRequest.of(0, 10);
         var revision = mockRevision(2L, "jane");
         var entity = new Item();
-        Object[] row = mockRow(entity, revision, RevisionType.MOD, Set.of()); // Set vazio
+        Object[] row = mockRow(entity, revision, RevisionType.MOD, Set.of());
         List<Object[]> rows = new ArrayList<>();
         rows.add(row);
         when(countQuery.getSingleResult()).thenReturn(1L);

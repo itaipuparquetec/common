@@ -11,7 +11,7 @@ import java.sql.SQLException;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * Registra os DataSource para cada tenantId de forma lazy (sem superpopular as conexões).
+ * Registers the DataSource for each tenantId lazily (without overpopulating connections).
  */
 @Slf4j
 public class TenantDataSourceRegistryImpl {

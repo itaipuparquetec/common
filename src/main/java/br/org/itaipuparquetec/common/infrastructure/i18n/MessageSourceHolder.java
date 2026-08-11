@@ -8,7 +8,7 @@ import org.springframework.context.i18n.LocaleContextHolder;
 import java.util.Locale;
 
 /**
- * Class MessageSourceHolder, resolve as mensagens de internacionalização.
+ * Class MessageSourceHolder, resolves internationalization messages.
  *
  * @author Emanuel Victor
  * @version 1.0.0

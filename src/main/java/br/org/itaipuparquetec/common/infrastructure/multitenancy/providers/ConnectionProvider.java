@@ -11,8 +11,8 @@ import java.sql.SQLException;
 import java.util.Map;
 
 /**
- * Provedor de conexão para o multitenancy. Provê a conexão do tenant para o hibernate.
- * Lembrando que as conexões são lazy (sem superpopular as conexões).
+ * Connection provider for multitenancy. Provides the tenant connection to hibernate.
+ * Note that connections are lazy (without overpopulating connections).
  */
 @RequiredArgsConstructor
 public class ConnectionProvider implements MultiTenantConnectionProvider<String>, HibernatePropertiesCustomizer {

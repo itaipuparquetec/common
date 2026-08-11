@@ -17,9 +17,9 @@ public class FilterSqmFunctionDescriptor extends AbstractSqmSelfRenderingFunctio
 
     public FilterSqmFunctionDescriptor(final TypeConfiguration typeConfiguration) {
         super(
-                "FILTER",                    // Function name
-                FunctionKind.NORMAL,             // Regular SQL function
-                StandardArgumentsValidators.min(2),  // Ao menos 2 argumentos
+                "FILTER",
+                FunctionKind.NORMAL,
+                StandardArgumentsValidators.min(2),
                 StandardFunctionReturnTypeResolvers.invariant(
                         typeConfiguration.getBasicTypeRegistry().resolve(StandardBasicTypes.BOOLEAN)
                 ),
@@ -29,28 +29,23 @@ public class FilterSqmFunctionDescriptor extends AbstractSqmSelfRenderingFunctio
 
     @Override
     public void render(final SqlAppender sqlAppender, final List<? extends SqlAstNode> sqlAstArguments, final ReturnableType<?> returnType, final SqlAstTranslator<?> walker) {
-        // Lidar com o caso onde o filtro é nulo separadamente
         sqlAppender.appendSql("(");
 
-        // Primeiro verificamos se o filtro é nulo ou vazio
         sqlAppender.appendSql("CASE WHEN ");
         sqlAstArguments.get(0).accept(walker);
         sqlAppender.appendSql(" IS NULL OR TRIM(CAST(");
         sqlAstArguments.get(0).accept(walker);
         sqlAppender.appendSql(" AS VARCHAR)) = '' THEN TRUE ELSE ");
 
-        // Se não for nulo ou vazio, usamos a função filter
         sqlAppender.appendSql("filter(CAST(");
         sqlAstArguments.get(0).accept(walker);
         sqlAppender.appendSql(" AS VARCHAR)");
 
-        // Argumentos restantes: os campos a serem pesquisados
         for (int i = 1; i < sqlAstArguments.size(); i++) {
             sqlAppender.appendSql(", ");
             sqlAstArguments.get(i).accept(walker);
         }
 
-        // Fechamos a chamada da função e o CASE
         sqlAppender.appendSql(") END)");
     }
 }

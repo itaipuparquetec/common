@@ -18,13 +18,13 @@ import java.util.HashSet;
 import java.util.regex.Pattern;
 
 /**
- * Service de migration resiliente para cada microservice.
- * As responsabilidades são:
- * - Criar a database se ela não existir;
- * - Criar a extensão unaccent caso ela não exista;
- * - Migrar o microservice para aquela database caso não tenha sido migrado (utilizando flyway);
- * - Fazer tudo isso para todos os tenants quando o microservices for startado, ou;
- * - Migrar um tenant específico quando solicitado (ex: via evento de criação de tenant).
+ * Resilient migration service for each microservice.
+ * Its responsibilities are:
+ * - Create the database if it does not exist;
+ * - Create the unaccent extension if it does not exist;
+ * - Migrate the microservice to that database if it has not been migrated yet (using flyway);
+ * - Do all of this for every tenant when the microservice starts, or;
+ * - Migrate a specific tenant when requested (e.g. via a tenant creation event).
  */
 @Slf4j
 @RequiredArgsConstructor

@@ -3,7 +3,7 @@ package br.org.itaipuparquetec.common.infrastructure.multitenancy.datasource;
 import br.org.itaipuparquetec.common.infrastructure.multitenancy.datasource.exceptions.TenantConnectionException;
 
 /**
- * Constrói o TenantConnectionInfo para o tenantId informado.
+ * Builds the TenantConnectionInfo for the given tenantId.
  */
 public class TenantConnectionInfoProvider {
 
@@ -18,11 +18,11 @@ public class TenantConnectionInfoProvider {
     }
 
     /**
-     * Resolve o TenantConnectionInfo para o tenantId informado.
-     * Por enquanto funciona com uma única base de dados.
+     * Resolves the TenantConnectionInfo for the given tenantId.
+     * For now it works with a single database.
      *
-     * @param tenantId {@link String} tenantId informado.
-     * @return {@link TenantConnectionInfo} TenantConnectionInfo construído/resolviod.
+     * @param tenantId {@link String} the given tenantId.
+     * @return {@link TenantConnectionInfo} the built/resolved TenantConnectionInfo.
      */
     public TenantConnectionInfo resolveInfoFor(final String tenantId) {
         return new TenantConnectionInfo(buildJdbcUrlFor(tenantId), username, password);
