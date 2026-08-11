@@ -144,6 +144,7 @@ public class PostgreSQLMigrationServiceImpl {
      *
      * @param tenantId {@link String}
      */
+    @SuppressWarnings("java:S2077")
     private void createDatabaseIfNotExists(final String tenantId) {
         try (Connection connection = tenantDataSourceRegistryImpl.openConnectionForTenant(HUBTI_TENANT);
              Statement statement = connection.createStatement()) {
