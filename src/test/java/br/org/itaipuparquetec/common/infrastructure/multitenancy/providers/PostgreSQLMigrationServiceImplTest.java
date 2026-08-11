@@ -9,15 +9,20 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
-import org.testcontainers.containers.PostgreSQLContainer;
-import org.testcontainers.junit.jupiter.Container;
+import org.springframework.test.context.DynamicPropertyRegistry;
+import org.springframework.test.context.DynamicPropertySource;
+import org.testcontainers.containers.GenericContainer;
+import org.testcontainers.containers.Network;
+import org.testcontainers.images.builder.ImageFromDockerfile;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
+import java.nio.file.Paths;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.time.Duration;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -33,12 +38,67 @@ class PostgreSQLMigrationServiceImplTest {
     private static final String SCHEMA = "common";
     private static final String CENTRAL_DB = "hubti";
     private static final String CONNECTION_INIT_SQL = "SET search_path TO " + SCHEMA + ", public";
+    private static final GenericContainer<?> POSTGRES;
 
-    @Container
-    private static final PostgreSQLContainer<?> POSTGRES = new PostgreSQLContainer<>("postgres:18-alpine")
-            .withDatabaseName(CENTRAL_DB)
-            .withUsername(CENTRAL_DB)
-            .withPassword(CENTRAL_DB);
+    static {
+
+        POSTGRES =
+                new GenericContainer<>(
+                        new ImageFromDockerfile()
+                                .withFileFromPath(
+                                        "Dockerfile",
+                                        Paths.get("src/test/resources/postgres/Dockerfile")
+                                )
+                ).withNetworkAliases("localhost")
+                        .withEnv("POSTGRES_DB", CENTRAL_DB)
+                        .withEnv("POSTGRES_USER", CENTRAL_DB)
+                        .withEnv("POSTGRES_PASSWORD", CENTRAL_DB)
+                        .withExposedPorts(5433)
+                        .withNetworkAliases("localhost")
+                        .withNetwork(Network.SHARED)
+                        .withStartupTimeout(Duration.ofMinutes(2))
+                        .withNetworkMode("bridge")
+                        .withStartupAttempts(3);
+
+        POSTGRES.start();
+
+        System.setProperty(
+                "spring.datasource.url",
+                "jdbc:postgresql://"
+                        + POSTGRES.getHost()
+                        + ":"
+                        + POSTGRES.getMappedPort(5433)
+                        + "/hubti"
+        );
+
+        System.setProperty("spring.datasource.username", "hubti");
+        System.setProperty("spring.datasource.password", "hubti");
+    }
+
+    @DynamicPropertySource
+    static void configureProperties(DynamicPropertyRegistry registry) {
+
+        String jdbcUrl =
+                "jdbc:postgresql://"
+                        + POSTGRES.getHost()
+                        + ":"
+                        + POSTGRES.getMappedPort(5433)
+                        + "/hubti";
+
+        registry.add("spring.datasource.url", () -> jdbcUrl);
+        registry.add("spring.datasource.username", () -> "hubti");
+        registry.add("spring.datasource.password", () -> "hubti");
+
+        registry.add("spring.datasource.driver-class-name",
+                () -> "org.postgresql.Driver");
+
+        registry.add("spring.datasource.hikari.schema", () -> "groups");
+        registry.add("spring.datasource.hikari.connection-init-sql", () -> "SET search_path TO groups, public");
+        registry.add("spring.datasource.hikari.minimum-idle", () -> "0");
+        registry.add("spring.datasource.hikari.idle-timeout", () -> "30000");
+        registry.add("hubti.multitenancy.enabled", () -> "true");
+    }
+
 
     private TenantDataSourceRegistryImpl registry;
     private PostgreSQLMigrationServiceImpl service;
@@ -47,10 +107,9 @@ class PostgreSQLMigrationServiceImplTest {
     void setUp() {
         final String centralUrl = "jdbc:postgresql://" + POSTGRES.getHost()
                 + ":" + POSTGRES.getFirstMappedPort() + "/" + CENTRAL_DB;
-        final var connectionInfoProvider = new TenantConnectionInfoProvider(
-                centralUrl, POSTGRES.getUsername(), POSTGRES.getPassword());
-        final var poolFactory = new TenantPoolFactory(
-                "org.postgresql.Driver", SCHEMA, CONNECTION_INIT_SQL, 5, 0, 30_000L, connectionInfoProvider);
+        final var connectionInfoProvider = new TenantConnectionInfoProvider(centralUrl, CENTRAL_DB, CENTRAL_DB);
+        final var poolFactory = new TenantPoolFactory("org.postgresql.Driver", SCHEMA, CONNECTION_INIT_SQL,
+                5, 0,30_000L, connectionInfoProvider);
         registry = new TenantDataSourceRegistryImpl(poolFactory);
         service = new PostgreSQLMigrationServiceImpl(registry, poolFactory);
     }
@@ -62,7 +121,7 @@ class PostgreSQLMigrationServiceImplTest {
 
     @ParameterizedTest
     @ValueSource(strings = {
-            "tenant; DROP DATABASE hubti",
+            "tenant; DROP DATABASE " + CENTRAL_DB,
             "tenant name",
             "tenant'--",
             "tenant\" OR 1=1",
