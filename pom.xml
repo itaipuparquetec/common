@@ -6,7 +6,7 @@
 
     <groupId>br.org.itaipuparquetec</groupId>
     <artifactId>java-common</artifactId>
-    <version>2.8.0</version>
+    <version>2.9.0</version>
     <packaging>jar</packaging>
 
     <name>java-common</name>
@@ -71,6 +71,9 @@
         <sonar-maven-plugin.version>3.11.0.3922</sonar-maven-plugin.version>
         <sonar.java.binaries>target/classes</sonar.java.binaries>
         <maven-checkstyle-plugin.version>3.6.0</maven-checkstyle-plugin.version>
+
+        <pitest-maven.version>1.25.9</pitest-maven.version>
+        <pitest-junit5-plugin.version>1.2.3</pitest-junit5-plugin.version>
     </properties>
 
     <dependencyManagement>
@@ -199,10 +202,95 @@
             <artifactId>mockito-junit-jupiter</artifactId>
             <scope>test</scope>
         </dependency>
+
+        <!-- Flyway is used only by the optional multitenancy starter; consumers already provide it. -->
+        <dependency>
+            <groupId>org.flywaydb</groupId>
+            <artifactId>flyway-core</artifactId>
+            <optional>true</optional>
+        </dependency>
+
+        <!-- Multitenancy starter tests (Testcontainers + Flyway against a real PostgreSQL). -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-testcontainers</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.flywaydb</groupId>
+            <artifactId>flyway-database-postgresql</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.postgresql</groupId>
+            <artifactId>postgresql</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.testcontainers</groupId>
+            <artifactId>postgresql</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.testcontainers</groupId>
+            <artifactId>junit-jupiter</artifactId>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
     <build>
         <plugins>
+            <plugin>
+                <groupId>org.pitest</groupId>
+                <artifactId>pitest-maven</artifactId>
+                <version>${pitest-maven.version}</version>
+                <dependencies>
+                    <dependency>
+                        <groupId>org.pitest</groupId>
+                        <artifactId>pitest-junit5-plugin</artifactId>
+                        <version>${pitest-junit5-plugin.version}</version>
+                    </dependency>
+                </dependencies>
+                <configuration>
+
+                    <mutationThreshold>100</mutationThreshold>
+
+                    <targetClasses>
+                        <param>br.org.itaipuparquetec.hubti.flows.application.*</param>
+                        <param>br.org.itaipuparquetec.hubti.flows.domain.*</param>
+                    </targetClasses>
+                    <targetTests>
+                        <param>br.org.itaipuparquetec.hubti.flows.application.*Test</param>
+                        <param>br.org.itaipuparquetec.hubti.flows.domain.*Test</param>
+                    </targetTests>
+
+                    <excludedClasses>
+                        <param>br.org.itaipuparquetec.hubti.*Main</param>
+                    </excludedClasses>
+
+                    <avoidCallsTo>
+                        <avoidCallsTo>org.slf4j</avoidCallsTo>
+                        <avoidCallsTo>java.util.logging</avoidCallsTo>
+                    </avoidCallsTo>
+
+                    <mutators>
+                        <mutator>DEFAULTS</mutator>
+                    </mutators>
+
+                    <timestampedReports>false</timestampedReports>
+                    <outputFormats>
+                        <param>HTML</param>
+                        <param>XML</param>
+                    </outputFormats>
+
+                </configuration>
+            </plugin>
+
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-checkstyle-plugin</artifactId>

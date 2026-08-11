@@ -21,7 +21,7 @@ public final class StandaloneBeanValidation {
     }
 
     /**
-     * Valida o bean em relação as suas anotações (faz isso sem precisar ir até o banco e abrir transação)
+     * Validates the bean against its annotations (does it without needing to reach the database and open a transaction)
      *
      * @param bean {T}
      */
