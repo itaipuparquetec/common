@@ -51,6 +51,7 @@
 - Use @ParameterizedTests ever where possible or necessary.
 - Try to use only assertJ, unless you have a good reason not to.
 - Try to mock with Mockito without annotations like `@Mock`, `@InjectMocks`, `@MockBean`, unless you have a good reason not to.
+- The min test coverage is 100%.
 
 ## Dependencies
 
