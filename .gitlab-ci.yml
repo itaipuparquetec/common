@@ -26,6 +26,7 @@ include:
   #  security
   - local: .gitlab/ci/security/java-common-sast.yml
   - local: .gitlab/ci/security/java-common-sbom.yml
+  - local: .gitlab/ci/security/java-common-dependency-scanning.yml
   - local: .gitlab/ci/security/java-common-secret-detection.yml
   #  code
   - local: .gitlab/ci/code/java-common-code.yml

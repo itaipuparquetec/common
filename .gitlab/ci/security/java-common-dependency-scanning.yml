@@ -1,0 +1,39 @@
+java-common-dependency-scanning:
+  stage: security
+  retry:
+    max: 2
+    when: runner_system_failure
+  allow_failure: true
+  image:
+    name: aquasec/trivy:latest
+    entrypoint: [""]
+  tags: [ common ]
+  variables:
+    SEVERITY_THRESHOLD: "HIGH,CRITICAL"
+  needs:
+    - job: java-common-sbom
+      artifacts: true
+  script:
+    - |
+      trivy sbom \
+        --no-progress \
+        --format json \
+        --output dependency-scanning.json \
+        --exit-code 0 \
+        target/sbom.json
+      trivy sbom \
+        --no-progress \
+        --severity "$SEVERITY_THRESHOLD" \
+        --exit-code 1 \
+        target/sbom.json
+  artifacts:
+    when: always
+    expire_in: 1 week
+    paths:
+      - dependency-scanning.json
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+    - if: '$CI_COMMIT_BRANCH == "main" && $CI_PIPELINE_SOURCE == "push"'
+    - if: '$CI_PIPELINE_SOURCE == "schedule"'
+      when: always
+    - when: never
