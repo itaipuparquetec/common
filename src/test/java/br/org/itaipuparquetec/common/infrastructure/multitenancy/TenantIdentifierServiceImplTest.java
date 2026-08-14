@@ -1,6 +1,5 @@
 package br.org.itaipuparquetec.common.infrastructure.multitenancy;
 
-import br.org.itaipuparquetec.common.domain.exceptions.ForbiddenException;
 import br.org.itaipuparquetec.common.domain.exceptions.NullFieldException;
 import org.hibernate.cfg.MultiTenancySettings;
 import org.junit.jupiter.api.Test;
