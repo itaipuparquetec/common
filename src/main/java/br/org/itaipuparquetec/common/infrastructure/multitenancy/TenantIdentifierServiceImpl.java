@@ -19,7 +19,7 @@ public class TenantIdentifierServiceImpl implements TenantIdentifierService, Cur
         tenantId.set(tenantName);
     }
 
-    private static void validateTenantName(final String tenantName){
+    private static void validateTenantName(final String tenantName) {
         new ExceptionBuilder().whenNullOrEmpty(tenantName, "tenantName").thenThrows();
     }
 
