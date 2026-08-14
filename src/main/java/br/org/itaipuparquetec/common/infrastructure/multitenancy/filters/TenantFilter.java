@@ -8,15 +8,25 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.jspecify.annotations.NonNull;
+import org.springframework.util.AntPathMatcher;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import java.util.List;
 
 @RequiredArgsConstructor
 public class TenantFilter extends OncePerRequestFilter {
 
     private final AuthenticationService authenticationService;
     private final TenantIdentifierServiceImpl tenantIdentifierService;
+    private final List<String> ignoredPaths;
+    private final AntPathMatcher pathMatcher = new AntPathMatcher();
+
+    @Override
+    protected boolean shouldNotFilter(@NonNull final HttpServletRequest request) {
+        final var path = pathWithinApplicationOf(request);
+        return ignoredPaths.stream().anyMatch(pattern -> pathMatcher.match(pattern, path));
+    }
 
     @Override
     protected void doFilterInternal(@NonNull final HttpServletRequest request,
@@ -29,5 +39,9 @@ public class TenantFilter extends OncePerRequestFilter {
             tenantIdentifierService.setTenantId(tenantName);
         }
         filterChain.doFilter(request, response);
+    }
+
+    private String pathWithinApplicationOf(final HttpServletRequest request) {
+        return request.getRequestURI().substring(request.getContextPath().length());
     }
 }

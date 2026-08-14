@@ -1,19 +1,26 @@
 package br.org.itaipuparquetec.common.infrastructure.multitenancy;
 
+import br.org.itaipuparquetec.common.application.services.TenantIdentifierService;
+import br.org.itaipuparquetec.common.domain.exceptions.ExceptionBuilder;
 import org.hibernate.cfg.MultiTenancySettings;
 import org.hibernate.context.spi.CurrentTenantIdentifierResolver;
 import org.springframework.boot.autoconfigure.orm.jpa.HibernatePropertiesCustomizer;
 
 import java.util.Map;
 
-public class TenantIdentifierServiceImpl implements CurrentTenantIdentifierResolver<String>, HibernatePropertiesCustomizer {
+public class TenantIdentifierServiceImpl implements TenantIdentifierService, CurrentTenantIdentifierResolver<String>, HibernatePropertiesCustomizer {
 
     private static final String HUBTI_TENANT = "hubti";
 
     private final ThreadLocal<String> tenantId = new ThreadLocal<>();
 
-    public void setTenantId(final String id) {
-        tenantId.set(id);
+    public void setTenantId(final String tenantName) {
+        validateTenantName(tenantName);
+        tenantId.set(tenantName);
+    }
+
+    private static void validateTenantName(final String tenantName){
+        new ExceptionBuilder().whenNullOrEmpty(tenantName, "tenantName").thenThrows();
     }
 
     public void clear() {

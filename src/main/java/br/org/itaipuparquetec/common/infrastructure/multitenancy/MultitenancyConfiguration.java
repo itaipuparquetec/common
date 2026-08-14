@@ -11,6 +11,7 @@ import br.org.itaipuparquetec.common.infrastructure.multitenancy.providers.Postg
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -24,6 +25,7 @@ import org.springframework.kafka.core.KafkaTemplate;
  */
 @Configuration
 @ConditionalOnProperty(prefix = "hubti.multitenancy", name = "enabled", havingValue = "true")
+@EnableConfigurationProperties(MultitenancyProperties.class)
 public class MultitenancyConfiguration {
 
     @Bean
@@ -89,9 +91,11 @@ public class MultitenancyConfiguration {
     @Bean
     public FilterRegistrationBean<TenantFilter> tenantFilter(
             final AuthenticationService authenticationService,
-            final TenantIdentifierServiceImpl tenantIdentifierServiceImpl) {
+            final TenantIdentifierServiceImpl tenantIdentifierServiceImpl,
+            final MultitenancyProperties multitenancyProperties) {
         final FilterRegistrationBean<TenantFilter> registrationBean = new FilterRegistrationBean<>();
-        registrationBean.setFilter(new TenantFilter(authenticationService, tenantIdentifierServiceImpl));
+        registrationBean.setFilter(new TenantFilter(
+                authenticationService, tenantIdentifierServiceImpl, multitenancyProperties.ignoredPaths()));
         registrationBean.addUrlPatterns("/*");
         return registrationBean;
     }

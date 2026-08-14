@@ -1,5 +1,7 @@
 package br.org.itaipuparquetec.common.infrastructure.multitenancy;
 
+import br.org.itaipuparquetec.common.domain.exceptions.ForbiddenException;
+import br.org.itaipuparquetec.common.domain.exceptions.NullFieldException;
 import org.hibernate.cfg.MultiTenancySettings;
 import org.junit.jupiter.api.Test;
 
@@ -7,10 +9,17 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 
 class TenantIdentifierServiceImplTest {
 
     private final TenantIdentifierServiceImpl resolver = new TenantIdentifierServiceImpl();
+
+    @Test
+    void shouldNotSetNullWithTenantId() {
+        assertThatThrownBy(() -> resolver.setTenantId(null)).isInstanceOf(NullFieldException.class)
+                .hasMessage("The field \"tenantName\" cannot be null.");
+    }
 
     @Test
     void resolvesTheTenantPreviouslySet() {
