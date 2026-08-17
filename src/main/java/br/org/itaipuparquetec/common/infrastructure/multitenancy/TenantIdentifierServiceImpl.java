@@ -11,12 +11,17 @@ import java.util.Map;
 public class TenantIdentifierServiceImpl implements TenantIdentifierService, CurrentTenantIdentifierResolver<String>, HibernatePropertiesCustomizer {
 
     private static final String HUBTI_TENANT = "hubti";
+    private static final String TENANT_KEY_WORD = "_tenant";
 
     private final ThreadLocal<String> tenantId = new ThreadLocal<>();
 
     public void setTenantId(final String tenantName) {
         validateTenantName(tenantName);
-        tenantId.set(tenantName);
+        if (!tenantName.equals(HUBTI_TENANT) && !tenantName.contains(TENANT_KEY_WORD)) {
+            tenantId.set(tenantName + TENANT_KEY_WORD);
+        } else {
+            tenantId.set(tenantName);
+        }
     }
 
     private static void validateTenantName(final String tenantName) {
