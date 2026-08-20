@@ -30,7 +30,7 @@ public class ReceiveNewTenantCreatedEventImpl {
      *
      * @param tenantId {@link String}
      */
-    @KafkaListener(topics = TENANT_CREATED_TOPIC, autoStartup = "${kafka.tenant-created-listener.enabled:false}")
+    @KafkaListener(topics = TENANT_CREATED_TOPIC, autoStartup = "${hubti.multitenancy.enabled:false}")
     public void handleNewTenantCreatedEvent(final String tenantId) {
         try {
             migrationService.migrateTenant(tenantId);
@@ -46,7 +46,7 @@ public class ReceiveNewTenantCreatedEventImpl {
      *
      * @param tenantId {@link String}
      */
-    @KafkaListener(topics = TENANT_CREATED_RETRY_TOPIC, autoStartup = "${kafka.tenant-created-listener.enabled:false}")
+    @KafkaListener(topics = TENANT_CREATED_RETRY_TOPIC, autoStartup = "${hubti.multitenancy.enabled:false}")
     public void handleNewTenantCreatedRetryEvent(final String tenantId) {
         migrationService.migrateTenant(tenantId);
         log.info("RETRY: Tenant {} migrated to microservice {}", tenantId, applicationName);
