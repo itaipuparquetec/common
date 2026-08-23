@@ -38,6 +38,8 @@
 ## Comments
 
 - Try to not use comments.
+- The code must explain itself.
+- If you need to JavaDoc comment on something, use English Language.
 
 ## Tests
 
