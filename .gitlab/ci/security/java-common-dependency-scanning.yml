@@ -15,17 +15,35 @@ java-common-dependency-scanning:
       artifacts: true
   script:
     - |
+      echo "== Escaneando SBOM: target/sbom.json =="
       trivy sbom \
         --no-progress \
         --format json \
         --output dependency-scanning.json \
         --exit-code 0 \
         target/sbom.json
-      trivy sbom \
+      if trivy sbom \
         --no-progress \
         --severity "$SEVERITY_THRESHOLD" \
         --exit-code 1 \
-        target/sbom.json
+        target/sbom.json; then
+        echo "OK: java-common sem vulnerabilidades ${SEVERITY_THRESHOLD}."
+      else
+        RED='\033[1;31m'
+        NC='\033[0m'
+        printf "${RED}\n"
+        printf "############################################################################\n"
+        printf "##  JOB FALHOU: vulnerabilidades %s encontradas\n" "$SEVERITY_THRESHOLD"
+        printf "##\n"
+        printf "##  Artefatos afetados:\n"
+        printf "##    - java-common\n"
+        printf "##\n"
+        printf "##  Acao necessaria: Ajuste as dependencias vulneraveis e faca novo push. \n"
+        printf "##  Relatorios completos: artefato dependency-scanning.json\n"
+        printf "############################################################################\n"
+        printf "${NC}"
+        exit 1
+      fi
   artifacts:
     when: always
     expire_in: 1 week
