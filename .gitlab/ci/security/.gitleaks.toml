@@ -1,2 +1,17 @@
 [extend]
 useDefault = true
+
+[[rules]]
+id = "hardcoded-low-entropy-credential"
+description = "Hardcoded credential in query/form/body style (low entropy), incl. OAuth client_secret"
+regex = '''(?i)\b(?:client_secret\s*=\s*|(?:password|passwd|pwd|secret|api[_-]?key|access[_-]?key|secret[_-]?key|private[_-]?key|auth[_-]?token)=)["']?[A-Za-z0-9._~-]{3,}'''
+keywords = ["client_secret", "password", "passwd", "pwd", "secret", "apikey", "api_key", "api-key", "accesskey", "access_key", "secretkey", "secret_key", "privatekey", "private_key", "authtoken", "auth_token"]
+
+[allowlist]
+description = "Ignore configuration placeholders and test fixtures"
+regexTarget = "line"
+regexes = ['''\$\{[^}]*\}''']
+paths = [
+  '''(^|/)src/test/''',
+  '''\.spec\.(ts|js)$''',
+]
