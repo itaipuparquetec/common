@@ -1,1 +1,4 @@
-br.org.itaipuparquetec.common.infrastructure.audit.trail.AuditTrailAutoConfiguration
+br.org.itaipuparquetec.common.infrastructure.trail.AuditTrailAutoConfiguration
+br.org.itaipuparquetec.common.infrastructure.trail.AuditOutboxAutoConfiguration
+br.org.itaipuparquetec.common.infrastructure.trail.AuditOutboxRelayAutoConfiguration
+br.org.itaipuparquetec.common.infrastructure.trail.AuditOutboxMigrationAutoConfiguration

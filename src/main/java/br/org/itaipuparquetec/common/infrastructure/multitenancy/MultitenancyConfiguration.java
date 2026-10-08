@@ -8,6 +8,8 @@ import br.org.itaipuparquetec.common.infrastructure.multitenancy.events.ReceiveN
 import br.org.itaipuparquetec.common.infrastructure.multitenancy.filters.TenantFilter;
 import br.org.itaipuparquetec.common.infrastructure.multitenancy.providers.ConnectionProvider;
 import br.org.itaipuparquetec.common.infrastructure.multitenancy.providers.PostgreSQLMigrationServiceImpl;
+import br.org.itaipuparquetec.common.infrastructure.trail.AuditProperties;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -58,8 +60,11 @@ public class MultitenancyConfiguration {
     @ConditionalOnMissingBean(PostgreSQLMigrationServiceImpl.class)
     public PostgreSQLMigrationServiceImpl postgreSQLMigrationServiceImpl(
             final TenantDataSourceRegistryImpl tenantDataSourceRegistryImpl,
-            final TenantPoolFactory tenantPoolFactory) {
-        return new PostgreSQLMigrationServiceImpl(tenantDataSourceRegistryImpl, tenantPoolFactory);
+            final TenantPoolFactory tenantPoolFactory,
+            final ObjectProvider<AuditProperties> auditProperties) {
+        final var audit = auditProperties.getIfAvailable();
+        final var migrateAuditOutbox = audit != null && audit.migratesOutboxSchema();
+        return new PostgreSQLMigrationServiceImpl(tenantDataSourceRegistryImpl, tenantPoolFactory, migrateAuditOutbox);
     }
 
     @Bean

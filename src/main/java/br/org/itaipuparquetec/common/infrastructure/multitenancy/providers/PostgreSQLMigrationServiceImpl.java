@@ -3,9 +3,9 @@ package br.org.itaipuparquetec.common.infrastructure.multitenancy.providers;
 import br.org.itaipuparquetec.common.infrastructure.multitenancy.datasource.TenantDataSourceRegistryImpl;
 import br.org.itaipuparquetec.common.infrastructure.multitenancy.datasource.TenantPoolFactory;
 import br.org.itaipuparquetec.common.infrastructure.multitenancy.datasource.exceptions.TenantMigrationException;
+import br.org.itaipuparquetec.common.infrastructure.trail.outbox.migration.AuditOutboxMigrator;
 import com.zaxxer.hikari.HikariDataSource;
 import jakarta.annotation.PostConstruct;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.flywaydb.core.Flyway;
 import org.flywaydb.core.api.configuration.FluentConfiguration;
@@ -15,6 +15,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.HashSet;
+import java.util.Set;
 import java.util.regex.Pattern;
 
 /**
@@ -24,10 +25,10 @@ import java.util.regex.Pattern;
  * - Create the unaccent extension if it does not exist;
  * - Migrate the microservice to that database if it has not been migrated yet (using flyway);
  * - Do all of this for every tenant when the microservice starts, or;
- * - Migrate a specific tenant when requested (e.g. via a tenant creation event).
+ * - Migrate a specific tenant when requested (e.g. via a tenant creation event);
+ * - Create the audit trail outbox table in every tenant when the audit trail outbox is enabled.
  */
 @Slf4j
-@RequiredArgsConstructor
 public class PostgreSQLMigrationServiceImpl {
 
     private static final String HUBTI_TENANT = "hubti";
@@ -38,6 +39,20 @@ public class PostgreSQLMigrationServiceImpl {
 
     private final TenantDataSourceRegistryImpl tenantDataSourceRegistryImpl;
     private final TenantPoolFactory tenantPoolFactory;
+    private final boolean migrateAuditOutbox;
+
+    public PostgreSQLMigrationServiceImpl(final TenantDataSourceRegistryImpl tenantDataSourceRegistryImpl,
+                                          final TenantPoolFactory tenantPoolFactory) {
+        this(tenantDataSourceRegistryImpl, tenantPoolFactory, false);
+    }
+
+    public PostgreSQLMigrationServiceImpl(final TenantDataSourceRegistryImpl tenantDataSourceRegistryImpl,
+                                          final TenantPoolFactory tenantPoolFactory,
+                                          final boolean migrateAuditOutbox) {
+        this.tenantDataSourceRegistryImpl = tenantDataSourceRegistryImpl;
+        this.tenantPoolFactory = tenantPoolFactory;
+        this.migrateAuditOutbox = migrateAuditOutbox;
+    }
 
     @PostConstruct
     public void init() {
@@ -45,7 +60,7 @@ public class PostgreSQLMigrationServiceImpl {
     }
 
     public void migrateAllTenants() {
-        getAllTenants().forEach(this::migrateTenant);
+        listTenants().forEach(this::migrateTenant);
     }
 
     public void migrateTenant(final String tenantId) {
@@ -90,9 +105,16 @@ public class PostgreSQLMigrationServiceImpl {
                     .failOnMissingLocations(true).defaultSchema(migrationPool.getSchema())
                     .locations("db/migrations").load();
             flyway.migrate();
+            migrateAuditOutboxOf(migrationPool);
         } catch (final Exception e) {
             log.error("Error while migrating name {}", tenantId, e);
             throw new TenantMigrationException("Flyway migration failed for tenant '" + tenantId + "'", e);
+        }
+    }
+
+    private void migrateAuditOutboxOf(final HikariDataSource migrationPool) {
+        if (migrateAuditOutbox) {
+            new AuditOutboxMigrator().migrate(migrationPool, migrationPool.getSchema());
         }
     }
 
@@ -121,7 +143,12 @@ public class PostgreSQLMigrationServiceImpl {
         return UNIQUE_VIOLATION_STATE.equals(sqlState) || DUPLICATE_OBJECT_STATE.equals(sqlState);
     }
 
-    private HashSet<String> getAllTenants() {
+    /**
+     * Lists the tenants known by the central database, always including the root tenant.
+     *
+     * @return the tenant names
+     */
+    public Set<String> listTenants() {
         final var tenants = new HashSet<String>();
         try (Connection connection = tenantDataSourceRegistryImpl.openConnectionForTenant(HUBTI_TENANT);
              Statement statement = connection.createStatement();

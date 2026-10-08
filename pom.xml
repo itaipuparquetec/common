@@ -6,7 +6,7 @@
 
     <groupId>br.org.itaipuparquetec</groupId>
     <artifactId>java-common</artifactId>
-    <version>2.9.4</version>
+    <version>2.10.0</version>
     <packaging>jar</packaging>
 
     <name>java-common</name>
@@ -53,7 +53,6 @@
         <jackson-annotations.version>2.18.2</jackson-annotations.version>
         <junit-jupiter-params.version>6.0.1</junit-jupiter-params.version>
         <jakarta.validation-api.version>3.1.1</jakarta.validation-api.version>
-        <jakarta.persistence-api.version>3.2.0</jakarta.persistence-api.version>
         <spring-data-hibernate-envers.version>4.0.0-M5</spring-data-hibernate-envers.version>
         <spring-boot-starter.version>3.5.11</spring-boot-starter.version>
 
@@ -99,6 +98,17 @@
         <dependency>
             <groupId>org.springframework.kafka</groupId>
             <artifactId>spring-kafka</artifactId>
+        </dependency>
+
+        <!-- Audit trail: W3C Trace Context propagation through Micrometer Tracing with the OpenTelemetry bridge (ADR-032). -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-actuator</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>io.micrometer</groupId>
+            <artifactId>micrometer-tracing-bridge-otel</artifactId>
         </dependency>
 
         <dependency>
@@ -147,7 +157,6 @@
         <dependency>
             <groupId>jakarta.persistence</groupId>
             <artifactId>jakarta.persistence-api</artifactId>
-            <version>${jakarta.persistence-api.version}</version>
         </dependency>
 
         <dependency>

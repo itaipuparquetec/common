@@ -4,11 +4,24 @@ import br.org.itaipuparquetec.common.infrastructure.multitenancy.datasource.Tena
 import br.org.itaipuparquetec.common.infrastructure.multitenancy.datasource.TenantDataSourceRegistryImpl;
 import br.org.itaipuparquetec.common.infrastructure.multitenancy.datasource.TenantPoolFactory;
 import br.org.itaipuparquetec.common.infrastructure.multitenancy.datasource.exceptions.TenantMigrationException;
+import br.org.itaipuparquetec.common.infrastructure.multitenancy.MultitenancyConfiguration;
+import br.org.itaipuparquetec.common.infrastructure.trail.AuditProperties;
+import br.org.itaipuparquetec.common.infrastructure.trail.AuditPropertiesFixture;
+import br.org.itaipuparquetec.common.infrastructure.trail.AuditSinkType;
+import br.org.itaipuparquetec.common.infrastructure.trail.metrics.AuditMetrics;
+import br.org.itaipuparquetec.common.infrastructure.trail.outbox.relay.AuditOutboxRelay;
+import br.org.itaipuparquetec.common.infrastructure.trail.outbox.relay.KafkaAuditOutboxPublisher;
+import br.org.itaipuparquetec.common.infrastructure.trail.outbox.relay.MultitenantOutboxCatalog;
+import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
+import org.apache.kafka.clients.producer.MockProducer;
+import org.apache.kafka.common.serialization.StringSerializer;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
+import org.springframework.beans.factory.ObjectProvider;
+import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.testcontainers.containers.GenericContainer;
@@ -22,9 +35,11 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.time.Clock;
 import java.time.Duration;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -101,6 +116,7 @@ class PostgreSQLMigrationServiceImplTest {
 
 
     private TenantDataSourceRegistryImpl registry;
+    private TenantPoolFactory poolFactory;
     private PostgreSQLMigrationServiceImpl service;
 
     @BeforeEach
@@ -108,8 +124,8 @@ class PostgreSQLMigrationServiceImplTest {
         final String centralUrl = "jdbc:postgresql://" + POSTGRES.getHost()
                 + ":" + POSTGRES.getFirstMappedPort() + "/" + CENTRAL_DB;
         final var connectionInfoProvider = new TenantConnectionInfoProvider(centralUrl, CENTRAL_DB, CENTRAL_DB);
-        final var poolFactory = new TenantPoolFactory("org.postgresql.Driver", SCHEMA, CONNECTION_INIT_SQL,
-                5, 0,30_000L, connectionInfoProvider);
+        poolFactory = new TenantPoolFactory("org.postgresql.Driver", SCHEMA, CONNECTION_INIT_SQL,
+                5, 0, 30_000L, connectionInfoProvider);
         registry = new TenantDataSourceRegistryImpl(poolFactory);
         service = new PostgreSQLMigrationServiceImpl(registry, poolFactory);
     }
@@ -195,6 +211,84 @@ class PostgreSQLMigrationServiceImplTest {
 
         assertTrue(databaseExists(CENTRAL_DB), "central database should exist");
         assertTrue(flywayMigrationCount(CENTRAL_DB) > 0, "central database should have been migrated");
+    }
+
+    @Test
+    void shouldNotCreateTheAuditOutboxTableByDefault() throws Exception {
+        final String tenant = "tenant_common_no_outbox";
+
+        service.migrateTenant(tenant);
+
+        assertFalse(tableExists(tenant, "audit_outbox"), "the outbox must only be created when enabled");
+    }
+
+    @Test
+    void shouldCreateTheAuditOutboxTableInTheTenantWhenTheOutboxIsEnabled() throws Exception {
+        final String tenant = "tenant_common_with_outbox";
+        final var outboxService = new PostgreSQLMigrationServiceImpl(registry, poolFactory, true);
+
+        outboxService.migrateTenant(tenant);
+
+        assertTrue(tableExists(tenant, "audit_outbox"), "the outbox table should exist in the service schema");
+        assertTrue(tableExists(tenant, "audit_flyway_history"), "the outbox keeps its own migration history");
+        assertDoesNotThrow(() -> outboxService.migrateTenant(tenant));
+    }
+
+    @Test
+    void shouldEnableTheAuditOutboxMigrationFromTheAuditConfiguration() throws Exception {
+        final String tenant = "tenant_common_from_config";
+        final var configured = new MultitenancyConfiguration().postgreSQLMigrationServiceImpl(registry, poolFactory,
+                providerOf(AuditPropertiesFixture.withSink(AuditSinkType.OUTBOX, false, 1_000)));
+
+        configured.migrateTenant(tenant);
+
+        assertTrue(tableExists(tenant, "audit_outbox"));
+    }
+
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
+    void shouldNotMigrateTheAuditOutboxWhenTheAuditConfigurationDoesNotAskForIt(final boolean auditConfigurationPresent)
+            throws Exception {
+        final String tenant = "tenant_common_not_configured_" + auditConfigurationPresent;
+        final var provider = auditConfigurationPresent
+                ? providerOf(AuditPropertiesFixture.withSink(AuditSinkType.LOG, false, 1_000))
+                : providerOf(null);
+        final var configured = new MultitenancyConfiguration()
+                .postgreSQLMigrationServiceImpl(registry, poolFactory, provider);
+
+        configured.migrateTenant(tenant);
+
+        assertFalse(tableExists(tenant, "audit_outbox"));
+    }
+
+    @Test
+    void shouldRelayThePendingEventsOfEveryTenantDatabaseDiscoveredInTheCentralDatabase() throws Exception {
+        final var outboxService = new PostgreSQLMigrationServiceImpl(registry, poolFactory, true);
+        outboxService.migrateTenant("tenant_relay_one");
+        outboxService.migrateTenant("tenant_relay_two");
+        insertOutboxRow("tenant_relay_one", "one");
+        insertOutboxRow("tenant_relay_two", "two");
+        final var producer = new MockProducer<>(true, new StringSerializer(), new StringSerializer());
+        final var catalog = new MultitenantOutboxCatalog(outboxService, registry, Clock.systemUTC(), Duration.ofSeconds(60));
+        final var relay = new AuditOutboxRelay(catalog, new KafkaAuditOutboxPublisher(producer, "hubti.trail.events"),
+                new AuditMetrics(new SimpleMeterRegistry(), "common"), AuditPropertiesFixture.relay());
+
+        relay.relayAllTenants();
+
+        assertTrue(producer.history().stream().anyMatch(it -> "one".equals(it.value())));
+        assertTrue(producer.history().stream().anyMatch(it -> "two".equals(it.value())));
+        assertEquals(0, pendingOutboxRows("tenant_relay_one"));
+        assertEquals(0, pendingOutboxRows("tenant_relay_two"));
+    }
+
+    @Test
+    void shouldListTheCentralTenantAndTheTenantsOfTheCentralDatabase() {
+        service.migrateTenant("tenant_common_listed");
+
+        final var tenants = service.listTenants();
+
+        assertTrue(tenants.contains(CENTRAL_DB));
+        assertTrue(tenants.contains("tenant_common_listed"));
     }
 
     @Test
@@ -318,6 +412,46 @@ class PostgreSQLMigrationServiceImplTest {
              PreparedStatement statement = connection.prepareStatement(
                      "SELECT 1 FROM pg_extension WHERE extname = ?")) {
             statement.setString(1, extension);
+            try (ResultSet resultSet = statement.executeQuery()) {
+                return resultSet.next();
+            }
+        }
+    }
+
+    private void insertOutboxRow(final String tenant, final String payload) throws Exception {
+        try (Connection connection = registry.openConnectionForTenant(tenant);
+             PreparedStatement statement = connection.prepareStatement("INSERT INTO audit_outbox (event_id, "
+                     + "schema_version, tenant, source_service, trace_id, span_id, payload) "
+                     + "VALUES (gen_random_uuid(), '1', ?, 'common', 'a', 'b', ?)")) {
+            statement.setString(1, tenant);
+            statement.setString(2, payload);
+            statement.executeUpdate();
+        }
+    }
+
+    private long pendingOutboxRows(final String tenant) throws Exception {
+        try (Connection connection = registry.openConnectionForTenant(tenant);
+             Statement statement = connection.createStatement();
+             ResultSet resultSet = statement.executeQuery("SELECT count(*) FROM audit_outbox")) {
+            resultSet.next();
+            return resultSet.getLong(1);
+        }
+    }
+
+    private static ObjectProvider<AuditProperties> providerOf(final AuditProperties properties) {
+        final var beanFactory = new DefaultListableBeanFactory();
+        if (properties != null) {
+            beanFactory.registerSingleton("auditProperties", properties);
+        }
+        return beanFactory.getBeanProvider(AuditProperties.class);
+    }
+
+    private boolean tableExists(final String tenant, final String table) throws Exception {
+        try (Connection connection = registry.openConnectionForTenant(tenant);
+             PreparedStatement statement = connection.prepareStatement(
+                     "SELECT 1 FROM information_schema.tables WHERE table_schema = ? AND table_name = ?")) {
+            statement.setString(1, SCHEMA);
+            statement.setString(2, table);
             try (ResultSet resultSet = statement.executeQuery()) {
                 return resultSet.next();
             }
