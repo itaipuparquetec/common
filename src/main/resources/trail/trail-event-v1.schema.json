@@ -1,0 +1,58 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://git.itaipuparquetec.org.br/fabrica-de-software/java-common/trail-event-v1.schema.json",
+  "title": "Trail event envelope v1",
+  "description": "Audit trail event published by the java-common starter. Mapping of the trail contract (ADR-031): no collections, no use case output, no exception message.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "eventId",
+    "occurredAt",
+    "durationMillis",
+    "tenant",
+    "sourceService",
+    "traceId",
+    "spanId",
+    "useCase",
+    "useCaseVersion",
+    "actorType",
+    "result"
+  ],
+  "properties": {
+    "schemaVersion": {"type": "string", "const": "1"},
+    "eventId": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"
+    },
+    "occurredAt": {"type": "string", "format": "date-time"},
+    "durationMillis": {"type": "integer", "minimum": 0},
+    "tenant": {"type": "string", "minLength": 1},
+    "actorTenant": {"type": "string"},
+    "sourceService": {"type": "string", "minLength": 1},
+    "sourceVersion": {"type": "string"},
+    "traceId": {"type": "string", "pattern": "^[0-9a-f]{32}$"},
+    "spanId": {"type": "string", "pattern": "^[0-9a-f]{16}$"},
+    "parentSpanId": {"type": "string", "pattern": "^[0-9a-f]{16}$"},
+    "useCase": {"type": "string", "minLength": 1},
+    "useCaseVersion": {"type": "string", "minLength": 1},
+    "actor": {"type": "string"},
+    "actorType": {"type": "string", "enum": ["USER", "SERVICE", "SYSTEM"]},
+    "sid": {"type": "string"},
+    "jti": {"type": "string"},
+    "result": {"type": "string", "enum": ["SUCCESS", "BUSINESS_ERROR", "TECHNICAL_ERROR"]},
+    "error": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["type", "category"],
+      "properties": {
+        "type": {"type": "string", "minLength": 1},
+        "category": {"type": "string", "enum": ["BUSINESS", "TECHNICAL"]}
+      }
+    },
+    "input": {"type": "string", "description": "Masked input of the use case as a serialized JSON document."},
+    "inputOmitted": {"type": "string", "enum": ["SIZE_LIMIT", "SERIALIZATION_ERROR"]}
+  },
+  "if": {"properties": {"result": {"not": {"const": "SUCCESS"}}}},
+  "then": {"required": ["error"]}
+}

@@ -11,12 +11,12 @@ import br.org.itaipuparquetec.common.infrastructure.multitenancy.providers.Postg
 import br.org.itaipuparquetec.common.infrastructure.trail.AuditProperties;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.DependsOn;
 import org.springframework.kafka.core.KafkaTemplate;
 
@@ -25,7 +25,7 @@ import org.springframework.kafka.core.KafkaTemplate;
  * It is only enabled when {@code hubti.multitenancy.enabled=true}, allowing microservices
  * with their own instrumentation (e.g. hubti-groups-api) to not inherit these beans.
  */
-@Configuration
+@AutoConfiguration
 @ConditionalOnProperty(prefix = "hubti.multitenancy", name = "enabled", havingValue = "true")
 @EnableConfigurationProperties(MultitenancyProperties.class)
 public class MultitenancyConfiguration {

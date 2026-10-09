@@ -275,8 +275,8 @@ class PostgreSQLMigrationServiceImplTest {
 
         relay.relayAllTenants();
 
-        assertTrue(producer.history().stream().anyMatch(record -> "one".equals(record.value())));
-        assertTrue(producer.history().stream().anyMatch(record -> "two".equals(record.value())));
+        assertTrue(producer.history().stream().anyMatch(producedRecord -> "one".equals(producedRecord.value())));
+        assertTrue(producer.history().stream().anyMatch(producedRecord -> "two".equals(producedRecord.value())));
         assertEquals(0, pendingOutboxRows("tenant_relay_one"));
         assertEquals(0, pendingOutboxRows("tenant_relay_two"));
     }

@@ -13,11 +13,15 @@ import com.fasterxml.jackson.databind.introspect.AnnotatedMember;
 import com.fasterxml.jackson.databind.ser.BeanPropertyWriter;
 import com.fasterxml.jackson.databind.ser.BeanSerializerModifier;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Wraps every classified property with a {@link MaskingSerializer}. Because Jackson serializes nested records,
- * collections and maps recursively, the classification of each component is honored at any depth.
+ * Keeps in the audit trail only the properties that carry a classification annotation
+ * ({@link Public}, {@link Internal}, {@link Confidential} or {@link Sensitive}) and wraps each one with a
+ * {@link MaskingSerializer} according to its strategy. A property without any classification annotation is
+ * omitted entirely: nothing of it reaches the trail. Because Jackson serializes nested records, collections and
+ * maps recursively, this rule is honored at any depth.
  */
 public class ClassificationBeanSerializerModifier extends BeanSerializerModifier {
 
@@ -33,17 +37,19 @@ public class ClassificationBeanSerializerModifier extends BeanSerializerModifier
     public List<BeanPropertyWriter> changeProperties(final SerializationConfig config,
                                                      final BeanDescription beanDescription,
                                                      final List<BeanPropertyWriter> beanProperties) {
+        final List<BeanPropertyWriter> classifiedProperties = new ArrayList<>(beanProperties.size());
         for (final BeanPropertyWriter writer : beanProperties) {
-            maskWhenClassified(writer);
+            final var classification = classificationOf(writer.getMember());
+            if (classification == null) {
+                continue;
+            }
+            maskWhenNeeded(writer, classification);
+            classifiedProperties.add(writer);
         }
-        return beanProperties;
+        return classifiedProperties;
     }
 
-    private void maskWhenClassified(final BeanPropertyWriter writer) {
-        final var classification = classificationOf(writer.getMember());
-        if (classification == null) {
-            return;
-        }
+    private void maskWhenNeeded(final BeanPropertyWriter writer, final DataClassification classification) {
         final var strategy = properties.resolveStrategy(classification);
         if (strategy != MaskingStrategy.NONE) {
             writer.assignSerializer(new MaskingSerializer(strategy, pseudonymizer));
