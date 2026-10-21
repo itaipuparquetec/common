@@ -42,3 +42,5 @@ build/
 .DS_Store
 # Insumos efemeros dos agentes - descartaveis, nunca versionar
 .efemero/
+.claude/settings.local.json
+.claude/worktrees/
