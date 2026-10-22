@@ -17,7 +17,6 @@ import java.util.concurrent.Executor;
 import java.util.concurrent.atomic.AtomicBoolean;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 import org.springframework.beans.factory.config.BeanDefinitionCustomizer;
 import org.springframework.boot.autoconfigure.AutoConfigurations;
 import org.springframework.boot.test.context.assertj.ApplicationContextAssert;
@@ -36,15 +35,15 @@ class AuditOutboxAutoConfigurationTest {
    void shouldWireTheOutboxSinkWhenTheOutboxSinkIsSelected() {
       this.runner.run(context -> {
          ((ApplicationContextAssert)Assertions.assertThat(context)).hasSingleBean(AuditEventSink.class);
-         Assertions.assertThat((AuditEventSink)context.getBean(AuditEventSink.class)).isInstanceOf(OutboxAuditEventSink.class);
-         Assertions.assertThat((AuditOutboxStore)context.getBean(AuditOutboxStore.class)).isInstanceOf(JpaAuditOutboxStore.class);
+         Assertions.assertThat(context.getBean(AuditEventSink.class)).isInstanceOf(OutboxAuditEventSink.class);
+         Assertions.assertThat(context.getBean(AuditOutboxStore.class)).isInstanceOf(JpaAuditOutboxStore.class);
          ((ApplicationContextAssert)Assertions.assertThat(context)).hasSingleBean(AuditMetrics.class);
       });
    }
 
    @Test
    void shouldNotWireTheOutboxWhenTheLogSinkIsSelected() {
-      ((ApplicationContextRunner)this.runner.withPropertyValues(new String[]{"audit.sink=log"})).run(context -> {
+      this.runner.withPropertyValues(new String[]{"audit.sink=log"}).run(context -> {
          ((ApplicationContextAssert)Assertions.assertThat(context)).doesNotHaveBean(OutboxAuditEventSink.class);
          ((ApplicationContextAssert)Assertions.assertThat(context)).doesNotHaveBean(AuditOutboxStore.class);
       });
@@ -52,7 +51,7 @@ class AuditOutboxAutoConfigurationTest {
 
    @Test
    void shouldNotWireTheOutboxWhenTheTrailIsDisabled() {
-      ((ApplicationContextRunner)this.runner.withPropertyValues(new String[]{"audit.enabled=false"})).run(context -> ((ApplicationContextAssert)Assertions.assertThat(context)).doesNotHaveBean(AuditOutboxStore.class));
+      this.runner.withPropertyValues(new String[]{"audit.enabled=false"}).run(context -> ((ApplicationContextAssert)Assertions.assertThat(context)).doesNotHaveBean(AuditOutboxStore.class));
    }
 
    @Test
@@ -66,24 +65,23 @@ class AuditOutboxAutoConfigurationTest {
    @Test
    void shouldRecordMetricsInTheMeterRegistryOfTheApplicationWhenThereIsOne() {
       SimpleMeterRegistry registry = new SimpleMeterRegistry();
-      ((ApplicationContextRunner)this.runner.withBean(MeterRegistry.class, () -> registry, new BeanDefinitionCustomizer[0])).run(context -> {
-         ((AuditMetrics)context.getBean(AuditMetrics.class)).outboxWriteFailed();
-         Assertions.assertThat(registry.counter("audit_outbox_write_failures", new String[]{"service", "mirror"}).count()).isEqualTo((double)1.0F);
+      this.runner.withBean(MeterRegistry.class, () -> registry, new BeanDefinitionCustomizer[0]).run(context -> {
+         context.getBean(AuditMetrics.class).outboxWriteFailed();
+         Assertions.assertThat(registry.counter("audit_outbox_write_failures", "service", "mirror").count()).isEqualTo(1.0F);
       });
    }
 
    @Test
    void shouldRecordMetricsInAPrivateRegistryWhenThereIsNone() {
-      this.runner.run(context -> Assertions.assertThat((AuditMetrics)context.getBean(AuditMetrics.class)).isNotNull());
+      this.runner.run(context -> Assertions.assertThat(context.getBean(AuditMetrics.class)).isNotNull());
    }
 
    @Test
    void shouldRouteTheDeferredWritesByTenantWhenTheServiceUsesDatabasePerTenant() {
       RecordingTenantIdentifierService tenants = new RecordingTenantIdentifierService();
-      ((ApplicationContextRunner)this.runner.withBean(TenantIdentifierService.class, () -> tenants, new BeanDefinitionCustomizer[0])).run(context -> {
-         ((AuditTenantScope)context.getBean(AuditTenantScope.class)).runAs("acme_tenant", () -> {
-         });
-         Assertions.assertThat(tenants.calls()).containsExactly(new String[]{"set:acme_tenant", "clear"});
+      this.runner.withBean(TenantIdentifierService.class, () -> tenants, new BeanDefinitionCustomizer[0]).run(context -> {
+         context.getBean(AuditTenantScope.class).runAs("acme_tenant", () -> {});
+         Assertions.assertThat(tenants.calls()).containsExactly("set:acme_tenant", "clear");
       });
    }
 
@@ -91,7 +89,7 @@ class AuditOutboxAutoConfigurationTest {
    void shouldJustRunTheDeferredWritesWhenTheServiceHasASingleDatabase() {
       this.runner.run(context -> {
          AtomicBoolean ran = new AtomicBoolean();
-         ((AuditTenantScope)context.getBean(AuditTenantScope.class)).runAs("hubti", () -> ran.set(true));
+         context.getBean(AuditTenantScope.class).runAs("hubti", () -> ran.set(true));
          Assertions.assertThat(ran).isTrue();
       });
    }
