@@ -3,20 +3,22 @@ package br.org.itaipuparquetec.common.infrastructure.trail.outbox;
 import br.org.itaipuparquetec.common.infrastructure.trail.outbox.migration.AuditOutboxMigrator;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
+import java.nio.file.Paths;
 import java.sql.Connection;
+import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.time.Duration;
 import java.util.UUID;
-import org.testcontainers.containers.PostgreSQLContainer;
-import org.testcontainers.containers.wait.strategy.Wait;
-import org.testcontainers.containers.wait.strategy.WaitAllStrategy;
+import org.testcontainers.containers.GenericContainer;
+import org.testcontainers.containers.Network;
+import org.testcontainers.images.builder.ImageFromDockerfile;
 
 public final class PostgresTestDatabase {
 
-    private static final Duration STARTUP_TIMEOUT = Duration.ofMinutes(2);
-    private static final int STARTUP_ATTEMPTS = 3;
-    private static final PostgreSQLContainer<?> POSTGRES = startedPostgres();
+    private static final String DATABASE = "hubti";
+    private static final int POSTGRES_PORT = 5433;
+    private static final GenericContainer<?> POSTGRES = startedPostgres();
 
     private PostgresTestDatabase() {
     }
@@ -28,9 +30,9 @@ public final class PostgresTestDatabase {
     public static HikariDataSource dataSourceOf(final String schema, final int maximumPoolSize) {
         createSchema(schema);
         final HikariConfig config = new HikariConfig();
-        config.setJdbcUrl(POSTGRES.getJdbcUrl());
-        config.setUsername(POSTGRES.getUsername());
-        config.setPassword(POSTGRES.getPassword());
+        config.setJdbcUrl(jdbcUrl());
+        config.setUsername(DATABASE);
+        config.setPassword(DATABASE);
         config.setMaximumPoolSize(maximumPoolSize);
         config.setConnectionTimeout(3000L);
         config.setConnectionInitSql("SET search_path TO " + schema + ", public");
@@ -44,24 +46,30 @@ public final class PostgresTestDatabase {
         return dataSourceOf(schema, maximumPoolSize);
     }
 
-    private static PostgreSQLContainer<?> startedPostgres() {
-        final PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>("postgres:18-alpine")
-                .waitingFor(reachableFromTheTests())
-                .withStartupAttempts(STARTUP_ATTEMPTS);
+    private static GenericContainer<?> startedPostgres() {
+        final GenericContainer<?> postgres = new GenericContainer<>(
+                new ImageFromDockerfile()
+                        .withFileFromPath("Dockerfile", Paths.get("src/test/resources/postgres/Dockerfile")))
+                .withNetworkAliases("localhost")
+                .withEnv("POSTGRES_DB", DATABASE)
+                .withEnv("POSTGRES_USER", DATABASE)
+                .withEnv("POSTGRES_PASSWORD", DATABASE)
+                .withExposedPorts(POSTGRES_PORT)
+                .withNetwork(Network.SHARED)
+                .withStartupTimeout(Duration.ofMinutes(2))
+                .withNetworkMode("bridge")
+                .withStartupAttempts(3);
         postgres.start();
         Runtime.getRuntime().addShutdownHook(new Thread(postgres::stop));
         return postgres;
     }
 
-    private static WaitAllStrategy reachableFromTheTests() {
-        return new WaitAllStrategy()
-                .withStrategy(Wait.forLogMessage(".*database system is ready to accept connections.*\\s", 2))
-                .withStrategy(Wait.forListeningPort())
-                .withStartupTimeout(STARTUP_TIMEOUT);
+    private static String jdbcUrl() {
+        return "jdbc:postgresql://" + POSTGRES.getHost() + ":" + POSTGRES.getMappedPort(POSTGRES_PORT) + "/" + DATABASE;
     }
 
     private static void createSchema(final String schema) {
-        try (Connection connection = POSTGRES.createConnection("");
+        try (Connection connection = DriverManager.getConnection(jdbcUrl(), DATABASE, DATABASE);
              Statement statement = connection.createStatement()) {
             statement.execute("CREATE SCHEMA IF NOT EXISTS " + schema);
         } catch (final SQLException failure) {

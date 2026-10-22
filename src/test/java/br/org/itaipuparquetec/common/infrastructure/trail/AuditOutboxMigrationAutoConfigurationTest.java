@@ -13,7 +13,9 @@ import org.springframework.boot.autoconfigure.AutoConfigurations;
 import org.springframework.boot.test.context.assertj.ApplicationContextAssert;
 import org.springframework.boot.test.context.runner.ApplicationContextRunner;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.testcontainers.junit.jupiter.Testcontainers;
 
+@Testcontainers
 class AuditOutboxMigrationAutoConfigurationTest {
    private final String schema = PostgresTestDatabase.newSchemaName();
    private final HikariDataSource dataSource;

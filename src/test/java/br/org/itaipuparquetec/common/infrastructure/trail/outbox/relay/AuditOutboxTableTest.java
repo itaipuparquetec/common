@@ -11,7 +11,9 @@ import org.junit.jupiter.api.Test;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.transaction.support.TransactionTemplate;
+import org.testcontainers.junit.jupiter.Testcontainers;
 
+@Testcontainers
 class AuditOutboxTableTest {
    private final String schema = PostgresTestDatabase.newSchemaName();
    private final HikariDataSource dataSource;

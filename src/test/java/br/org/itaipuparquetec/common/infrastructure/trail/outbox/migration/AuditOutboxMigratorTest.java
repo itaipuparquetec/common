@@ -8,7 +8,9 @@ import org.assertj.core.api.ListAssert;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.testcontainers.junit.jupiter.Testcontainers;
 
+@Testcontainers
 class AuditOutboxMigratorTest {
    private final String schema = PostgresTestDatabase.newSchemaName();
    private final HikariDataSource dataSource;

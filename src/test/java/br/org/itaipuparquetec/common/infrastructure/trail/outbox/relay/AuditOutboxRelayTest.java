@@ -24,7 +24,9 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.testcontainers.junit.jupiter.Testcontainers;
 
+@Testcontainers
 class AuditOutboxRelayTest {
    private final String schema = PostgresTestDatabase.newSchemaName();
    private final HikariDataSource dataSource;
