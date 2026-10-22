@@ -1,5 +1,6 @@
 ## Code style
 
+- Language: all code is written in **English** — identifiers (classes, methods, variables, files), test names and descriptions, comments and JavaDoc. Only user-facing text (labels, messages, i18n) stays in Portuguese.
 - Functions: 4-20 lines. Split if longer.
 - Files: under 500 lines. Split by responsibility.
 - One thing per function, one responsibility per module (SRP).
