@@ -32,12 +32,7 @@ public class TenantFilter extends OncePerRequestFilter {
     protected void doFilterInternal(@NonNull final HttpServletRequest request,
                                     @NonNull final HttpServletResponse response,
                                     @NonNull final FilterChain filterChain) throws ServletException, IOException {
-        final var tenantName = authenticationService.getTenantName();
-        if (tenantName.equals("hubti") && request.getHeader("tenant_name") != null) {
-            tenantIdentifierService.setTenantId(request.getHeader("tenant_name"));
-        } else {
-            tenantIdentifierService.setTenantId(tenantName);
-        }
+        tenantIdentifierService.setTenantId(authenticationService.getTenantName());
         filterChain.doFilter(request, response);
     }
 
