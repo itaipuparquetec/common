@@ -13,6 +13,17 @@
 - Never serialize/deserialize Lists.
 - The code must be like a natural language – So you can use prepositions like 'in','of', 'from', etc.
 
+### Layers and boundaries
+
+- A use case never returns an object of the domain (entity, aggregate, value object or a record of `domain/model`). It
+  returns its own nested `Output` record, also inside `Page<Output>` or `Optional<Output>`. The domain never leaves the
+  application layer.
+- A `*Rest` answers its own response record (`*Response`), converted from the `Output` of its use case. It never
+  exposes the domain model or a JPA entity, and never reads a repository directly: always through a use case.
+- A microservice never calls another microservice directly: every synchronous call goes through the gateway, including
+  the authorization server (token, JWKS, discovery). The clients this library offers (e.g. the TenantService client,
+  the JWKS of the issuers) receive addresses of the gateway from the configuration, never the port of a service.
+
 ### Demeter Law
 
 - Try to preserve Demeter Law.
