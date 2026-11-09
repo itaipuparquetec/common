@@ -12,6 +12,7 @@ import java.time.Duration;
 import java.util.UUID;
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.Network;
+import org.testcontainers.containers.wait.strategy.Wait;
 import org.testcontainers.images.builder.ImageFromDockerfile;
 
 public final class PostgresTestDatabase {
@@ -46,6 +47,10 @@ public final class PostgresTestDatabase {
         return dataSourceOf(schema, maximumPoolSize);
     }
 
+    /**
+     * On its first start the PostgreSQL image opens the port, runs its initialization and restarts: it is only ready
+     * at the second "ready to accept connections", not when the port answers.
+     */
     private static GenericContainer<?> startedPostgres() {
         final GenericContainer<?> postgres = new GenericContainer<>(
                 new ImageFromDockerfile()
@@ -57,6 +62,7 @@ public final class PostgresTestDatabase {
                 .withExposedPorts(POSTGRES_PORT)
                 .withNetwork(Network.SHARED)
                 .withStartupTimeout(Duration.ofMinutes(2))
+                .waitingFor(Wait.forLogMessage(".*database system is ready to accept connections.*\\s", 2))
                 .withNetworkMode("bridge")
                 .withStartupAttempts(3);
         postgres.start();

@@ -1,38 +1,31 @@
 package br.org.itaipuparquetec.common.infrastructure.blacklist;
 
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.annotation.KafkaListener;
-import org.springframework.kafka.core.KafkaTemplate;
 
+/**
+ * Keeps the {@link TokenBlacklist} of this instance with the revoked tokens the authorization server publishes. Every
+ * instance of every service needs every revoked token, so each instance has a consumer group of its own. It reads
+ * the topic from its beginning: a new instance rebuilds the tokens still revoked, as long as the retention of the
+ * topic covers the longest life of an access token.
+ */
 @Slf4j
-@RequiredArgsConstructor
 public class ReceiveKafkaMessage {
 
     public static final String BLACK_LIST_TOPIC = "BLACK_LIST_TOPIC";
-    public static final String BLACK_LIST_RETRY_TOPIC = "BLACK_LIST_TOPIC";
+    private static final String GROUP_OF_THE_INSTANCE = "${spring.application.name:hubti}-blacklist-${random.uuid}";
+    private static final String FROM_THE_BEGINNING = "auto.offset.reset=earliest";
 
     private final TokenBlacklist tokenBlacklist;
-    private final KafkaTemplate<String, AuthenticationMessage> kafkaTemplate;
 
-    @KafkaListener(topics = BLACK_LIST_TOPIC, autoStartup = "${kafka.blacklist-listener.enabled:false}")
-    public void listenBlackListTopic(final AuthenticationMessage authenticationMessage) {
-        try {
-
-            log.info("Received message from BLACK_LIST_TOPIC");
-
-            tokenBlacklist.revoke(authenticationMessage.token());
-
-        } catch (Exception e) {
-            log.error("Error processing blacklist message: {}", e.getMessage());
-            kafkaTemplate.send(BLACK_LIST_RETRY_TOPIC, authenticationMessage);
-        }
+    public ReceiveKafkaMessage(final TokenBlacklist tokenBlacklist) {
+        this.tokenBlacklist = tokenBlacklist;
     }
 
-    @KafkaListener(topics = BLACK_LIST_RETRY_TOPIC, autoStartup = "${kafka.blacklist-listener.enabled:false}")
-    public void listenBlackListRetryTopic(final AuthenticationMessage authenticationMessage) {
-        log.info("Received message from BLACK_LIST_RETRY_TOPIC");
-
+    @KafkaListener(topics = BLACK_LIST_TOPIC, groupId = GROUP_OF_THE_INSTANCE, properties = FROM_THE_BEGINNING,
+            autoStartup = "${kafka.blacklist-listener.enabled:false}")
+    public void listenBlackListTopic(final AuthenticationMessage authenticationMessage) {
+        log.debug("Received a revoked token from {}", BLACK_LIST_TOPIC);
         tokenBlacklist.revoke(authenticationMessage.token());
     }
 }

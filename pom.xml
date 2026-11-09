@@ -6,7 +6,7 @@
 
     <groupId>br.org.itaipuparquetec</groupId>
     <artifactId>java-common</artifactId>
-    <version>4.0.0</version>
+    <version>4.0.4</version>
     <packaging>jar</packaging>
 
     <name>java-common</name>
