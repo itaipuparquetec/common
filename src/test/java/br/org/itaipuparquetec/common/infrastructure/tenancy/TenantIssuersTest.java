@@ -18,6 +18,16 @@ class TenantIssuersTest {
         assertThat(tenantIssuers.issuerOf("acme_tenant")).isEqualTo("https://hubti.example.org/acme_tenant");
     }
 
+    @ParameterizedTest
+    @CsvSource({
+            "https://hubti.example.org, https://hubti.example.org/acme_tenant",
+            "https://hubti.example.org///, https://hubti.example.org/acme_tenant",
+            "///, /acme_tenant"
+    })
+    void dropsEveryTrailingSlashOfTheBase(final String baseUri, final String issuer) {
+        assertThat(new TenantIssuers(baseUri).issuerOf("acme_tenant")).isEqualTo(issuer);
+    }
+
     @Test
     void readsTheTenantBackFromItsIssuer() {
         assertThat(tenantIssuers.tenantOf("https://hubti.example.org/acme_tenant")).contains("acme_tenant");

@@ -5,6 +5,7 @@ import com.github.benmanes.caffeine.cache.Caffeine;
 import com.github.benmanes.caffeine.cache.Expiry;
 import com.github.benmanes.caffeine.cache.Ticker;
 import com.nimbusds.jwt.JWTParser;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.text.ParseException;
@@ -25,6 +26,7 @@ public class TokenBlacklist {
     private final Clock clock;
     private final Cache<String, Instant> revokedUntil;
 
+    @Autowired
     public TokenBlacklist() {
         this(Clock.systemUTC(), Ticker.systemTicker());
     }

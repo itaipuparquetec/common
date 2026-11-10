@@ -17,7 +17,15 @@ public class TenantIssuers {
         if (baseUri == null || baseUri.isBlank()) {
             throw new IllegalArgumentException("Expected the base URI of the tenant issuers (hubti.auth.issuer-base-uri), but got '" + baseUri + "'");
         }
-        this.baseUri = baseUri.replaceAll("/+$", "");
+        this.baseUri = withoutTrailingSlashes(baseUri);
+    }
+
+    private static String withoutTrailingSlashes(final String uri) {
+        var end = uri.length();
+        while (end > 0 && uri.charAt(end - 1) == '/') {
+            end--;
+        }
+        return uri.substring(0, end);
     }
 
     public String issuerOf(final String tenantName) {

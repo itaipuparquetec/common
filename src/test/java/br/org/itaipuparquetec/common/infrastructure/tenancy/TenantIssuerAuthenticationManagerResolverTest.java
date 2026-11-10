@@ -62,8 +62,9 @@ class TenantIssuerAuthenticationManagerResolverTest {
     void refusesATokenOfAnUnknownIssuerAsInvalid() {
         final var request = requestWithTokenOf("https://evil.example.org/acme_tenant");
         final var token = new BearerTokenAuthenticationToken(tokenValueOf("https://evil.example.org/acme_tenant"));
+        final var authenticationManager = resolver.resolve(request);
 
-        assertThatThrownBy(() -> resolver.resolve(request).authenticate(token)).isInstanceOf(InvalidBearerTokenException.class);
+        assertThatThrownBy(() -> authenticationManager.authenticate(token)).isInstanceOf(InvalidBearerTokenException.class);
     }
 
     private JwtDecoder fakeDecoderOf(final String tenantName, final String issuer) {
