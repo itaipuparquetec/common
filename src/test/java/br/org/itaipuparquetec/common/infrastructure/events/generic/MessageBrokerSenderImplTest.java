@@ -24,6 +24,7 @@ class MessageBrokerSenderImplTest {
 
     private static final String TOPIC = "ANY_TOPIC";
     private static final String MESSAGE = "any-message";
+    private static final String KEY = "acme_tenant:any-id";
 
     private KafkaTemplate<String, String> kafkaTemplate;
 
@@ -34,6 +35,8 @@ class MessageBrokerSenderImplTest {
     void setUp() {
         kafkaTemplate = mock(KafkaTemplate.class);
         when(kafkaTemplate.send(anyString(), anyString()))
+                .thenReturn(CompletableFuture.completedFuture(mock(SendResult.class)));
+        when(kafkaTemplate.send(anyString(), anyString(), anyString()))
                 .thenReturn(CompletableFuture.completedFuture(mock(SendResult.class)));
 
         sender = new TestMessageBrokerSender(kafkaTemplate);
@@ -104,6 +107,41 @@ class MessageBrokerSenderImplTest {
         TransactionSynchronizationManager.getSynchronizations().forEach(synchronization ->
                 synchronization.afterCompletion(TransactionSynchronization.STATUS_ROLLED_BACK));
         verifyNoInteractions(kafkaTemplate);
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
+    void shouldPublishWithTheKeySoTheMessagesOfTheSameKeyKeepTheirOrder() {
+        final Consumer<String> logger = mock(Consumer.class);
+
+        sender.send(TOPIC, KEY, MESSAGE, logger);
+
+        verify(kafkaTemplate).send(TOPIC, KEY, MESSAGE);
+        verifyNoInteractions(logger);
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
+    void shouldInvokeTheProvidedLoggerWhenThePublicationWithTheKeyFails() {
+        when(kafkaTemplate.send(anyString(), anyString(), anyString()))
+                .thenReturn(CompletableFuture.failedFuture(new KafkaException("timeout")));
+        final Consumer<String> logger = mock(Consumer.class);
+
+        assertThatCode(() -> sender.send(TOPIC, KEY, MESSAGE, logger)).doesNotThrowAnyException();
+
+        verify(logger).accept(MESSAGE);
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
+    void shouldPublishWithTheKeyOnlyAfterTheCommitOfTheTransaction() {
+        TransactionSynchronizationManager.initSynchronization();
+
+        sender.send(TOPIC, KEY, MESSAGE, mock(Consumer.class));
+
+        verifyNoInteractions(kafkaTemplate);
+        TransactionSynchronizationManager.getSynchronizations().forEach(TransactionSynchronization::afterCommit);
+        verify(kafkaTemplate).send(TOPIC, KEY, MESSAGE);
     }
 
     @Test

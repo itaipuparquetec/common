@@ -1,61 +1,31 @@
 package br.org.itaipuparquetec.common.infrastructure.blacklist;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.kafka.core.KafkaTemplate;
+import org.springframework.kafka.annotation.KafkaListener;
 
-import static org.assertj.core.api.Assertions.assertThatCode;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.Mockito.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 
 class ReceiveKafkaMessageTest {
 
     private final TokenBlacklist tokenBlacklist = mock(TokenBlacklist.class);
-    private final KafkaTemplate<String, AuthenticationMessage> kafkaTemplate = mock(KafkaTemplate.class);
-
-    private ReceiveKafkaMessage receiveKafkaMessage;
-
-    @BeforeEach
-    void setUp() {
-        receiveKafkaMessage = new ReceiveKafkaMessage(tokenBlacklist, kafkaTemplate);
-    }
+    private final ReceiveKafkaMessage receiveKafkaMessage = new ReceiveKafkaMessage(tokenBlacklist);
 
     @Test
-    void revokeCalledWhenMessageReceived() {
-        final var message = new AuthenticationMessage("token-value");
-
-        receiveKafkaMessage.listenBlackListTopic(message);
+    void revokesTheTokenReceived() {
+        receiveKafkaMessage.listenBlackListTopic(new AuthenticationMessage("token-value"));
 
         verify(tokenBlacklist).revoke("token-value");
     }
 
     @Test
-    void handlesExceptionFromRevoke() {
-        final var message = new AuthenticationMessage("bad-token");
-        doThrow(new RuntimeException("boom")).when(tokenBlacklist).revoke("bad-token");
+    void everyInstanceReadsEveryRevokedTokenFromTheBeginningOfTheTopic() throws NoSuchMethodException {
+        final var listener = ReceiveKafkaMessage.class.getMethod("listenBlackListTopic", AuthenticationMessage.class)
+                .getAnnotation(KafkaListener.class);
 
-        assertThatCode(() -> receiveKafkaMessage.listenBlackListTopic(message)).doesNotThrowAnyException();
-
-        verify(tokenBlacklist).revoke("bad-token");
-    }
-
-    @Test
-    void revokeCalledWhenRetryMessageReceived() {
-        final var message = new AuthenticationMessage("retry-token");
-
-        receiveKafkaMessage.listenBlackListRetryTopic(message);
-
-        verify(tokenBlacklist).revoke("retry-token");
-    }
-
-    @Test
-    void propagatesExceptionWhenRetryRevokeFails() {
-        final var message = new AuthenticationMessage("bad-retry-token");
-        doThrow(new RuntimeException("retry boom")).when(tokenBlacklist).revoke("bad-retry-token");
-
-        assertThatThrownBy(() -> receiveKafkaMessage.listenBlackListRetryTopic(message))
-                .isInstanceOf(RuntimeException.class)
-                .hasMessage("retry boom");
+        assertThat(listener.topics()).containsExactly(ReceiveKafkaMessage.BLACK_LIST_TOPIC);
+        assertThat(listener.groupId()).contains("${random.uuid}");
+        assertThat(listener.properties()).containsExactly("auto.offset.reset=earliest");
     }
 }
-

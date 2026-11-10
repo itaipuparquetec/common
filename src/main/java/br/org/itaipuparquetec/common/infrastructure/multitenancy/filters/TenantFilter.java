@@ -14,6 +14,11 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import java.io.IOException;
 import java.util.List;
 
+/**
+ * The tenant of a request authenticated by a token is the tenant of the token. The tenant lives in the thread, and
+ * the threads serve requests of every person and tenant, so the thread is left without tenant at the end of the
+ * request: otherwise the next request served by it would read the database of the tenant of someone else.
+ */
 @RequiredArgsConstructor
 public class TenantFilter extends OncePerRequestFilter {
 
@@ -32,13 +37,12 @@ public class TenantFilter extends OncePerRequestFilter {
     protected void doFilterInternal(@NonNull final HttpServletRequest request,
                                     @NonNull final HttpServletResponse response,
                                     @NonNull final FilterChain filterChain) throws ServletException, IOException {
-        final var tenantName = authenticationService.getTenantName();
-        if (tenantName.equals("hubti") && request.getHeader("tenant_name") != null) {
-            tenantIdentifierService.setTenantId(request.getHeader("tenant_name"));
-        } else {
-            tenantIdentifierService.setTenantId(tenantName);
+        tenantIdentifierService.setTenantId(authenticationService.getTenantName());
+        try {
+            filterChain.doFilter(request, response);
+        } finally {
+            tenantIdentifierService.clear();
         }
-        filterChain.doFilter(request, response);
     }
 
     private String pathWithinApplicationOf(final HttpServletRequest request) {
