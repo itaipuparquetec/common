@@ -6,12 +6,30 @@
 - One thing per function, one responsibility per module (SRP).
 - Names: specific and unique. Avoid `data`, `handler`, `Manager`.
   Prefer names that return <5 grep hits in the codebase.
+- Field, variable and mock names are the name of their type in camelCase, in main and in tests:
+  `TokenBlacklist tokenBlacklist`, `mock(AuthenticationService.class)` in `authenticationService`.
+  Never a shortened name (`blacklist`, `authService`, `repo`); a different name only when two of the same type live
+  together.
+- Injected fields form a pyramid: the shortest `private final ...` line first, then the next shortest, up to the longest.
+  With `@RequiredArgsConstructor` the constructor follows the order of the fields, so the `new XxxImpl(...)` in the tests
+  follows the pyramid too.
 - Types: explicit. No `any`, no `Dict`, no untyped functions.
 - Early returns over nested ifs. Max 2 levels of indentation.
 - Exception messages must include the offending value and expected shape.
 - Exception classes must be named ending 'Exception'.
 - Never serialize/deserialize Lists.
 - The code must be like a natural language – So you can use prepositions like 'in','of', 'from', etc.
+
+### Layers and boundaries
+
+- A use case never returns an object of the domain (entity, aggregate, value object or a record of `domain/model`). It
+  returns its own nested `Output` record, also inside `Page<Output>` or `Optional<Output>`. The domain never leaves the
+  application layer.
+- A `*Rest` answers its own response record (`*Response`), converted from the `Output` of its use case. It never
+  exposes the domain model or a JPA entity, and never reads a repository directly: always through a use case.
+- A microservice never calls another microservice directly: every synchronous call goes through the gateway, including
+  the authorization server (token, JWKS, discovery). The clients this library offers (e.g. the TenantService client,
+  the JWKS of the issuers) receive addresses of the gateway from the configuration, never the port of a service.
 
 ### Demeter Law
 

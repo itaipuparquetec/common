@@ -3,6 +3,7 @@ package br.org.itaipuparquetec.common.infrastructure.multitenancy.filters;
 import br.org.itaipuparquetec.common.application.services.AuthenticationService;
 import br.org.itaipuparquetec.common.infrastructure.multitenancy.TenantIdentifierServiceImpl;
 import jakarta.servlet.FilterChain;
+import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.junit.jupiter.api.BeforeEach;
@@ -13,6 +14,8 @@ import org.junit.jupiter.params.provider.CsvSource;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -38,36 +41,37 @@ class TenantFilterTest {
         filterChain = mock(FilterChain.class);
     }
 
-    @Test
-    void usesTheHeaderTenantWhenAuthenticatedAsHubtiAndHeaderIsPresent() throws Exception {
-        when(authenticationService.getTenantName()).thenReturn("hubti");
-        when(request.getHeader("tenant_name")).thenReturn("acme_tenant");
+    @ParameterizedTest
+    @CsvSource({"hubti", "acme_tenant"})
+    void usesTheTenantOfTheTokenEvenWithATenantHeader(final String tenantOfTheToken) throws Exception {
+        when(authenticationService.getTenantName()).thenReturn(tenantOfTheToken);
+        when(request.getHeader("tenant_name")).thenReturn("other_tenant");
 
         tenantFilter.doFilterInternal(request, response, filterChain);
 
-        verify(tenantIdentifierService).setTenantId("acme_tenant");
+        verify(tenantIdentifierService).setTenantId(tenantOfTheToken);
         verify(filterChain).doFilter(request, response);
     }
 
     @Test
-    void fallsBackToTheAuthenticatedTenantWhenHubtiButHeaderIsAbsent() throws Exception {
-        when(authenticationService.getTenantName()).thenReturn("hubti");
-        when(request.getHeader("tenant_name")).thenReturn(null);
-
-        tenantFilter.doFilterInternal(request, response, filterChain);
-
-        verify(tenantIdentifierService).setTenantId("hubti");
-        verify(filterChain).doFilter(request, response);
-    }
-
-    @Test
-    void usesTheAuthenticatedTenantWhenItIsNotHubti() throws Exception {
+    void leavesTheThreadWithoutTenantAtTheEndSoTheNextRequestDoesNotInheritIt() throws Exception {
         when(authenticationService.getTenantName()).thenReturn("acme_tenant");
 
         tenantFilter.doFilterInternal(request, response, filterChain);
 
-        verify(tenantIdentifierService).setTenantId("acme_tenant");
-        verify(filterChain).doFilter(request, response);
+        verify(tenantIdentifierService).clear();
+    }
+
+    @Test
+    void leavesTheThreadWithoutTenantEvenWhenTheRequestFails() throws Exception {
+        when(authenticationService.getTenantName()).thenReturn("acme_tenant");
+        doThrow(new ServletException("failed request"))
+                .when(filterChain).doFilter(request, response);
+
+        assertThatThrownBy(() -> tenantFilter.doFilterInternal(request, response, filterChain))
+                .isInstanceOf(ServletException.class);
+
+        verify(tenantIdentifierService).clear();
     }
 
     @ParameterizedTest

@@ -3,10 +3,13 @@ package br.org.itaipuparquetec.common.infrastructure.events.generic;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.core.KafkaTemplate;
+import org.springframework.kafka.support.SendResult;
 import org.springframework.transaction.support.TransactionSynchronization;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 
+import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
+import java.util.function.Supplier;
 
 /**
  * Default implementation of the {@link MessageBrokerSender} interface to send messages to the message broker.
@@ -25,21 +28,31 @@ public abstract class MessageBrokerSenderImpl<M> implements MessageBrokerSender<
 
     @Override
     public void send(final String topic, final M message, final Consumer<M> logger) {
+        afterTheCommit(() -> publish(() -> kafkaTemplate.send(topic, message), message, logger));
+    }
+
+    @Override
+    public void send(final String topic, final String key, final M message, final Consumer<M> logger) {
+        afterTheCommit(() -> publish(() -> kafkaTemplate.send(topic, key, message), message, logger));
+    }
+
+    private static void afterTheCommit(final Runnable publication) {
         if (!TransactionSynchronizationManager.isSynchronizationActive()) {
-            publish(topic, message, logger);
+            publication.run();
             return;
         }
 
         TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
             @Override
             public void afterCommit() {
-                publish(topic, message, logger);
+                publication.run();
             }
         });
     }
 
-    private void publish(final String topic, final M message, final Consumer<M> logger) {
-        kafkaTemplate.send(topic, message)
+    private void publish(final Supplier<CompletableFuture<SendResult<String, M>>> sending,
+                         final M message, final Consumer<M> logger) {
+        sending.get()
                 .whenComplete((result, failure) -> {
                     if (failure != null) {
                         log.atError()

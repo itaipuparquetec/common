@@ -171,10 +171,28 @@ public class PostgreSQLMigrationServiceImpl {
      *
      * @param tenantId {@link String}
      */
-    @SuppressWarnings("java:S2077")
     private void createDatabaseIfNotExists(final String tenantId) {
-        try (Connection connection = tenantDataSourceRegistryImpl.openConnectionForTenant(HUBTI_TENANT);
-             Statement statement = connection.createStatement()) {
+        try (Connection connection = tenantDataSourceRegistryImpl.openConnectionForTenant(HUBTI_TENANT)) {
+            createDatabaseIfNotExists(tenantId, connection);
+        } catch (final Exception e) {
+            if (e.getMessage() != null && e.getMessage().toLowerCase().contains("already exists")) {
+                return;
+            }
+            log.error("Error to create database {}", tenantId, e);
+            throw new TenantMigrationException("Cannot create database for tenant '" + tenantId + "'", e);
+        }
+    }
+
+    /**
+     * Create a new database from tenantId, if not exists.
+     * Without using springdata instrumentation. It's working standalone, and it's a public static method to be used from other methods.
+     *
+     * @param tenantId {@link String}
+     * @param connection {@link Connection}
+     */
+    @SuppressWarnings("java:S2077")
+    public static void createDatabaseIfNotExists(final String tenantId, final Connection connection) {
+        try (Statement statement = connection.createStatement()) {
             statement.executeUpdate("CREATE DATABASE " + tenantId);
             log.info("Success to create database {}", tenantId);
         } catch (final Exception e) {

@@ -3,3 +3,4 @@ br.org.itaipuparquetec.common.infrastructure.trail.AuditOutboxAutoConfiguration
 br.org.itaipuparquetec.common.infrastructure.trail.AuditOutboxRelayAutoConfiguration
 br.org.itaipuparquetec.common.infrastructure.trail.AuditOutboxMigrationAutoConfiguration
 br.org.itaipuparquetec.common.infrastructure.multitenancy.MultitenancyConfiguration
+br.org.itaipuparquetec.common.infrastructure.tenancy.TenantIssuerAutoConfiguration
