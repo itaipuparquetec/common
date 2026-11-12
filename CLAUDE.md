@@ -77,6 +77,7 @@
 ## Dependencies
 
 - Try to inject dependencies through constructor/parameter, try to don't use global/import.
+- Container images (Dockerfile `FROM`, docker-compose `image:`, CI job `image:`) always pin an explicit version (e.g. `nginx:1.30`, `postgres:18.1-alpine`, `semgrep/semgrep:1.184.0`); never `latest` nor an image without a tag. Images published by our own pipelines keep the tag the CI publishes (`SNAPSHOT` or the release).
 
 ## Structure
 
