@@ -5,7 +5,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.core.task.TaskDecorator;
 import org.springframework.stereotype.Component;
 
-@Component
 @RequiredArgsConstructor
 public class TenantPropagationTaskDecorator implements TaskDecorator {
 
