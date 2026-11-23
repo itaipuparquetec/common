@@ -3,7 +3,6 @@ package br.org.itaipuparquetec.common.infrastructure.async;
 import br.org.itaipuparquetec.common.application.services.TenantIdentifierService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.task.TaskDecorator;
-import org.springframework.stereotype.Component;
 
 @RequiredArgsConstructor
 public class TenantPropagationTaskDecorator implements TaskDecorator {
